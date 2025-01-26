@@ -5,18 +5,25 @@ import { Github, ExternalLink } from 'lucide-react';
 import { Project } from '../../../utils/types';
 import { containerVariants, itemVariants } from '../../../utils/animations';
 
+// Convert YouTube URL to embed format
+const getEmbedUrl = (url: string) => {
+  const videoId = url.split('v=')[1];
+  return `https://www.youtube.com/embed/${videoId}`;
+};
+
 const projects: Project[] = [
   {
     id: "1",
-    title: "Project 1",
+    title: "React Ecommerce Site Demo",
     slug: "project-1", 
-    description: "Description of project 1",
-    technologies: ["React", "Next.js", "TypeScript"],
+    description: "Group Project for building a React Ecommerce Site.",
+    technologies: ["React"],
     image: "/api/placeholder/600/400",
     featured: true,
     links: {
-      github: "https://github.com/yourusername/project1",
-      live: "https://project1.com"
+      github: "https://github.com/MazRadwan/FinalSprintPCJS/tree/main/src",
+      live: "https://steeleandstubble.netlify.app",
+      video: "https://www.youtube.com/watch?v=kD9ln3EDJAc"
     },
     date: "2024-01"
   },
@@ -61,13 +68,24 @@ export function Projects() {
                 variants={itemVariants}
                 className="group relative bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
               >
-                <div className="aspect-[16/9] overflow-hidden">
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                </div>
+                {project.links.video ? (
+  <div className="aspect-video">
+    <iframe
+      src={getEmbedUrl(project.links.video)}
+      className="w-full h-full"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowFullScreen
+    />
+  </div>
+) : (
+  <div className="aspect-[16/9] overflow-hidden">
+    <img
+      src={project.image}
+      alt={project.title}
+      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+    />
+  </div>
+)}
                 
                 <div className="p-6 space-y-4">
                   <h3 className="text-xl font-semibold">{project.title}</h3>

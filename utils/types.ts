@@ -13,6 +13,7 @@ export interface Project {
     github?: string;
     live?: string;
     demo?: string;
+    video?: string;
   };
   details?: {
     problem: string;
