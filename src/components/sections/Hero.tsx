@@ -81,7 +81,7 @@ export function Hero() {
             className="mt-12 flex items-center gap-6"
           >
             <a
-              href="https://github.com/yourusername"
+              href="https://github.com/MazRadwan"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
@@ -90,7 +90,7 @@ export function Hero() {
               <Github className="w-6 h-6" />
             </a>
             <a
-              href="https://linkedin.com/in/yourusername"
+              href="https://linkedin.com/in/maz-radwan"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
@@ -99,7 +99,7 @@ export function Hero() {
               <Linkedin className="w-6 h-6" />
             </a>
             <a
-              href="mailto:your.email@example.com"
+              href="mailto:mazradwan@icloud.com"
               className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
             >
               <span className="sr-only">Email</span>

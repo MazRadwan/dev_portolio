@@ -24,19 +24,16 @@ function FooterLink({ href, children }: FooterLinkProps) {
 function SocialLinks() {
   return (
     <div className="flex items-center space-x-6">
-      <FooterLink href="https://github.com/yourusername">
+      <FooterLink href="https://github.com/MazRadwan">
         <span className="sr-only">GitHub</span>
         <Github className="w-6 h-6" />
       </FooterLink>
-      <FooterLink href="https://linkedin.com/in/yourusername">
+      <FooterLink href="https://linkedin.com/in/maz-radwan">
         <span className="sr-only">LinkedIn</span>
         <Linkedin className="w-6 h-6" />
       </FooterLink>
-      <FooterLink href="https://twitter.com/yourusername">
-        <span className="sr-only">Twitter</span>
-        <Twitter className="w-6 h-6" />
-      </FooterLink>
-      <FooterLink href="mailto:your.email@example.com">
+  
+      <FooterLink href="mazradwan@icloud.com">
         <span className="sr-only">Email</span>
         <Mail className="w-6 h-6" />
       </FooterLink>
@@ -101,10 +98,10 @@ export function Footer() {
                 <ul className="mt-4 space-y-4">
                   <li>
                     <a
-                      href="mailto:your.email@example.com"
+                      href="mailto:mazradwan@icloud.com"
                       className="text-base text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
                     >
-                      your.email@example.com
+                      mazradwan@icloud.com
                     </a>
                   </li>
                   <li>
