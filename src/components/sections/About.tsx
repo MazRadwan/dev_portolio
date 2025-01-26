@@ -82,9 +82,10 @@ export function About() {
 
           <div className="space-y-4 text-gray-600 dark:text-gray-400">
             <p>
-              I'm a software developer completing a 2-year software development
-              program, with a strong foundation in full-stack development and
-              cloud technologies.
+              I'm a software developer, with a strong foundation in full-stack development and
+              cloud technologies. I am a certified Quality Assurance/Quality Tester and 
+              a certified AWS Cloud Practicioner.
+              I am curently enrolled in a Data Science/Machine Learning program.
             </p>
             <p>
               My journey in tech is driven by a passion for creating efficient,
@@ -97,6 +98,7 @@ export function About() {
               <li>Advanced React patterns and best practices</li>
               <li>Cloud architecture and AWS services</li>
               <li>Data structures and algorithms</li>
+              <li>Data Science and Machine Learning</li>
               <li>Cybersecurity fundamentals</li>
             </ul>
           </div>
@@ -110,7 +112,7 @@ export function About() {
               {[
                 "React",
                 "Node.js",
-                "TypeScript",
+                "JavaScript",
                 "AWS",
                 "PostgreSQL",
                 "ExpressJS",
@@ -120,6 +122,7 @@ export function About() {
                 "Docker",
                 "Tailwind CSS",
                 "HTML/CSS",
+                "Python",
               ].map((tech) => (
                 <span
                   key={tech}

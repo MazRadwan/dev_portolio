@@ -25,21 +25,52 @@ const projects: Project[] = [
       live: "https://steeleandstubble.netlify.app",
       video: "https://www.youtube.com/watch?v=kD9ln3EDJAc"
     },
-    date: "2024-01"
+    date: "2024-04"
   },
   {
     id: "2",
-    title: "Project 2",
+    title: "AeroTraq Flight Booking and Tracking System",
     slug: "project-2",
-    description: "Description of project 2",
-    technologies: ["React", "Node.js", "MongoDB"],
+    description: "Group Project Spring Boot and React.",
+    technologies: ["React", "Spring Boot", "MySQL", "Elastic Beanstalk"],
     image: "/api/placeholder/600/400",
     featured: true,
     links: {
-      github: "https://github.com/yourusername/project2", 
-      live: "https://project2.com"
+      github: "https://github.com/MazRadwan/LyonsDen", 
+      live: "http://aviation-react-frontend.s3-website.ca-central-1.amazonaws.com",
+      video: "https://www.youtube.com/watch?v=LVRYLoyQnQc"
     },
-    date: "2024-01"
+    date: "2024-12"
+  },
+  {
+    id: "3",
+    title: "Therapist Office Website",
+    slug: "project-3",
+    description: "Client website create in react React.",
+    technologies: ["React"],
+    image: "/api/placeholder/600/400",
+    featured: true,
+    links: {
+      github: "https://github.com/thisissomethingwow/SDAT_Sprint1_Sprint2_Server", 
+      live: "https://alyonsdentherapy.com",
+      video: "https://www.youtube.com/watch?v=7WMzEy-0_0k"
+    },
+    date: "2024-12"
+  },
+  {
+    id: "4",
+    title: "Therapist Office Website",
+    slug: "project-4",
+    description: "Artist Portfolio Website.",
+    technologies: ["HTML", "CSS"],
+    image: "/api/placeholder/600/400",
+    featured: true,
+    links: {
+      github: "https://github.com/MazRadwan/art-porfolio", 
+      live: "https://mazradwan.github.io/art-porfolio/",
+      video: "https://www.youtube.com/watch?v=AFfIXC-zZrg"
+    },
+    date: "2023-09"
   }
 ];
 
