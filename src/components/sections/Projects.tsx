@@ -59,7 +59,7 @@ const projects: Project[] = [
   },
   {
     id: "4",
-    title: "Therapist Office Website",
+    title: "Artist Portfolio Website",
     slug: "project-4",
     description: "Artist Portfolio Website.",
     technologies: ["HTML", "CSS"],
