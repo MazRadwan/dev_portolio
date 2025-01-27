@@ -20,10 +20,10 @@ export function Layout({ children }: LayoutProps) {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900">
-      <Navigation isScrolled={isScrolled} />
-      <main className="flex-grow">{children}</main>
-      <Footer />
-    </div>
+    <div className="min-h-screen min-w-full flex flex-col bg-white dark:bg-gray-900">
+  <Navigation isScrolled={isScrolled} />
+  <main className="flex-grow overflow-x-hidden">{children}</main>
+  <Footer />
+</div>
   );
 }
