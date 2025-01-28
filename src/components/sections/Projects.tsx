@@ -36,7 +36,7 @@ const projects: Project[] = [
     image: "/api/placeholder/600/400",
     featured: true,
     links: {
-      github: "https://github.com/MazRadwan/LyonsDen", 
+      github: "https://github.com/MazRadwan/Aerotraq_backend", 
       live: "http://aviation-react-frontend.s3-website.ca-central-1.amazonaws.com",
       video: "https://www.youtube.com/watch?v=LVRYLoyQnQc"
     },
@@ -51,7 +51,7 @@ const projects: Project[] = [
     image: "/api/placeholder/600/400",
     featured: true,
     links: {
-      github: "https://github.com/thisissomethingwow/SDAT_Sprint1_Sprint2_Server", 
+      github: "https://github.com/MazRadwan/LyonsDen", 
       live: "https://alyonsdentherapy.com",
       video: "https://www.youtube.com/watch?v=7WMzEy-0_0k"
     },
