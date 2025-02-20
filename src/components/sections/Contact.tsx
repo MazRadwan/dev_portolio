@@ -21,19 +21,29 @@ export function Contact() {
             onSubmit={(e) => {
               e.preventDefault()
               setStatus('loading')
+
               // Form submission handled by Netlify
+
               const form = e.target as HTMLFormElement
+              const formData = new FormData(form)
+
+              // Lines added 
+              formData.append('form-name', 'contact')
+              formData.append('bot-field', formData.get('bot-field') || '')
+
               fetch('/', {
                 method: 'POST',
-                body: new FormData(form)
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(formData as any).toString(),
               })
               .then(() => {
                 setStatus('success')
                 form.reset()
               })
               .catch(() => setStatus('error'))
-            }}
+            }}    
           >
+            <input type="hidden" name="bot-field" />
             <input type="hidden" name="form-name" value="contact" />
             
             <div>
