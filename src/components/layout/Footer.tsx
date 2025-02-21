@@ -106,7 +106,7 @@ export function Footer() {
                   </li>
                   <li>
                     <a
-                      href="/Maz%20Radwan%20FullStack%20Resume.pdf" // updated resume link
+                      href="/Maz%20Radwan%20FullStack%20Resume.pdf" 
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-base text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
