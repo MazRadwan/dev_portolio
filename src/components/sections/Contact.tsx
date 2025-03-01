@@ -5,7 +5,7 @@ export function Contact() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   
   return (
-    <section id="contact" className="py-16 bg-white dark:bg-gray-900">
+    <section id="contact" className="py-16 bg-white dark:bg-gray-900" style={{ scrollMarginTop: '5rem' }}>
       <Container>
         <div className="max-w-2xl mx-auto space-y-8">
           <div className="text-center text-gray-900 dark:text-white">
