@@ -1,18 +1,13 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Container } from '@/components/ui/Container';
 import { Github, ExternalLink } from 'lucide-react';
 import { Project } from '../../../utils/types';
 import { containerVariants, itemVariants } from '../../../utils/animations';
 
-
 const getEmbedUrl = (url: string) => {
-
   const videoId = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^?&]+)/)?.[1];
-  
   if (!videoId) return '';
-  
-
   return `https://www.youtube.com/embed/${videoId}?modestbranding=1&rel=0&color=white`;
 };
 
@@ -82,6 +77,55 @@ const projects: Project[] = [
 export function Projects() {
   const [playing, setPlaying] = useState<string | null>(null);
 
+  // Enhanced animation variants specific for projects
+  const projectContainerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.3,
+      }
+    }
+  };
+
+  const projectItemVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: 50,
+      scale: 0.95
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { 
+        type: "spring", 
+        stiffness: 100, 
+        damping: 12, 
+        duration: 0.5 
+      }
+    }
+  };
+
+  const videoPlayerVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: { 
+        type: "spring", 
+        stiffness: 200, 
+        damping: 20 
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      scale: 0.8,
+      transition: { duration: 0.2 }
+    }
+  };
+
   return (
     <section id="projects" className="py-16 md:py-24 bg-gray-50 dark:bg-gray-800/50">
       <Container>
@@ -89,7 +133,7 @@ export function Projects() {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-100px" }}
           className="space-y-8"
         >
           <div className="text-center space-y-4">
@@ -99,48 +143,91 @@ export function Projects() {
             </p>
           </div>
           
-          <motion.div className="grid gap-8 md:grid-cols-2">
+          <motion.div 
+            className="grid gap-8 md:grid-cols-2"
+            variants={projectContainerVariants}
+          >
             {projects.map((project) => (
               <motion.div
                 key={project.id}
-                variants={itemVariants}
-                className="group relative bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
+                variants={projectItemVariants}
+                className="group relative bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
+                whileHover={{ 
+                  y: -5,
+                  transition: { duration: 0.2 }
+                }}
               >
                 {project.links.video ? (
-  <div className="aspect-video relative group cursor-pointer" onClick={() => setPlaying(playing === project.id ? null : project.id)}>
-    {playing === project.id ? (
-      <iframe
-        src={`${getEmbedUrl(project.links.video)}&autoplay=1`}
-        className="w-full h-full"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      />
-    ) : (
-      <>
-        <img 
-          src={`https://img.youtube.com/vi/${project.links.video.split('v=')[1]?.split('&')[0]}/mqdefault.jpg`}
-          alt={project.title}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors">
-          <div className="w-16 h-16 flex items-center justify-center rounded-full bg-white/90 group-hover:bg-white transition-colors">
-            <svg className="w-8 h-8 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </div>
-        </div>
-      </>
-    )}
-  </div>
-) : (
-  <div className="aspect-[16/9] overflow-hidden">
-    <img
-      src={project.image}
-      alt={project.title}
-      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-    />
-  </div>
-)}
+                  <motion.div 
+                    className="aspect-video relative group cursor-pointer" 
+                    onClick={() => setPlaying(playing === project.id ? null : project.id)}
+                    whileHover={{ 
+                      scale: 1.02,
+                      transition: { duration: 0.2 }
+                    }}
+                  >
+                    <AnimatePresence mode="wait">
+                      {playing === project.id ? (
+                        <motion.iframe
+                          key="video-player"
+                          variants={videoPlayerVariants}
+                          initial="hidden"
+                          animate="visible"
+                          exit="exit"
+                          src={`${getEmbedUrl(project.links.video)}&autoplay=1`}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      ) : (
+                        <motion.div
+                          key="video-thumbnail"
+                          variants={videoPlayerVariants}
+                          initial="hidden"
+                          animate="visible"
+                          exit="exit"
+                          className="w-full h-full"
+                        >
+                          <img 
+                            src={`https://img.youtube.com/vi/${project.links.video.split('v=')[1]?.split('&')[0]}/mqdefault.jpg`}
+                            alt={project.title}
+                            className="w-full h-full object-cover"
+                          />
+                          <motion.div 
+                            className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors"
+                            initial={{ opacity: 0.8 }}
+                            whileHover={{ opacity: 1 }}
+                          >
+                            <motion.div 
+                              className="w-16 h-16 flex items-center justify-center rounded-full bg-white/90 group-hover:bg-white transition-colors"
+                              whileHover={{ 
+                                scale: 1.1,
+                                boxShadow: "0 0 20px rgba(255,255,255,0.5)"
+                              }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              <svg className="w-8 h-8 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z" />
+                              </svg>
+                            </motion.div>
+                          </motion.div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                ) : (
+                  <motion.div 
+                    className="aspect-[16/9] overflow-hidden"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </motion.div>
+                )}
                 
                 <div className="p-6 space-y-4">
                   <h3 className="text-xl font-semibold">{project.title}</h3>
@@ -148,37 +235,45 @@ export function Projects() {
                   
                   <div className="flex flex-wrap gap-2">
                     {project.technologies.map(tech => (
-                      <span 
+                      <motion.span 
                         key={tech}
                         className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-full"
+                        whileHover={{ 
+                          scale: 1.05,
+                          backgroundColor: "rgba(59, 130, 246, 0.1)" 
+                        }}
                       >
                         {tech}
-                      </span>
+                      </motion.span>
                     ))}
                   </div>
                   
                   <div className="flex gap-4 pt-4">
                     {project.links.github && (
-                      <a
+                      <motion.a
                         href={project.links.github}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                       >
                         <Github className="w-5 h-5" />
                         <span>Code</span>
-                      </a>
+                      </motion.a>
                     )}
                     {project.links.live && (
-                      <a
+                      <motion.a
                         href={project.links.live}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                       >
                         <ExternalLink className="w-5 h-5" />
                         <span>Live Demo</span>
-                      </a>
+                      </motion.a>
                     )}
                   </div>
                 </div>
