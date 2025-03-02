@@ -1,14 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Container } from '@/components/ui/Container';
 import { Github, ExternalLink } from 'lucide-react';
 import { Project } from '../../../utils/types';
 import { containerVariants, itemVariants } from '../../../utils/animations';
 
-// Convert YouTube URL to embed format
+
 const getEmbedUrl = (url: string) => {
-  const videoId = url.split('v=')[1];
-  return `https://www.youtube.com/embed/${videoId}`;
+
+  const videoId = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^?&]+)/)?.[1];
+  
+  if (!videoId) return '';
+  
+
+  return `https://www.youtube.com/embed/${videoId}?modestbranding=1&rel=0&color=white`;
 };
 
 const projects: Project[] = [
@@ -75,6 +80,8 @@ const projects: Project[] = [
 ];
 
 export function Projects() {
+  const [playing, setPlaying] = useState<string | null>(null);
+
   return (
     <section id="projects" className="py-16 md:py-24 bg-gray-50 dark:bg-gray-800/50">
       <Container>
@@ -100,13 +107,30 @@ export function Projects() {
                 className="group relative bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
               >
                 {project.links.video ? (
-  <div className="aspect-video">
-    <iframe
-      src={getEmbedUrl(project.links.video)}
-      className="w-full h-full"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-      allowFullScreen
-    />
+  <div className="aspect-video relative group cursor-pointer" onClick={() => setPlaying(playing === project.id ? null : project.id)}>
+    {playing === project.id ? (
+      <iframe
+        src={`${getEmbedUrl(project.links.video)}&autoplay=1`}
+        className="w-full h-full"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      />
+    ) : (
+      <>
+        <img 
+          src={`https://img.youtube.com/vi/${project.links.video.split('v=')[1]?.split('&')[0]}/mqdefault.jpg`}
+          alt={project.title}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors">
+          <div className="w-16 h-16 flex items-center justify-center rounded-full bg-white/90 group-hover:bg-white transition-colors">
+            <svg className="w-8 h-8 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </div>
+        </div>
+      </>
+    )}
   </div>
 ) : (
   <div className="aspect-[16/9] overflow-hidden">
