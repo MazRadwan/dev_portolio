@@ -46,7 +46,7 @@ export function Navigation({ isScrolled }: NavigationProps) {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
               >
                 {item.name}
               </Link>
@@ -92,7 +92,7 @@ export function Navigation({ isScrolled }: NavigationProps) {
                 >
                   <Link
                     href={item.href}
-                    className="text-base font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors px-4 py-2 block"
+                    className="text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors px-4 py-2 block"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {item.name}
