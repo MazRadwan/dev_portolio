@@ -83,9 +83,8 @@ export function About() {
           <div className="space-y-4 text-gray-600 dark:text-gray-400">
             <p>
               I'm a software developer, with a strong foundation in full-stack development and
-              cloud technologies. I am a certified Quality Assurance/Quality Tester, and 
-              a certified AWS Cloud Practicioner / AWS Cloud Developer.
-              I am curently enrolled in a Data Science/Machine Learning program.
+              cloud technologies. I am a certified Quality Assurance/Quality Control Tester, and 
+              a certified AWS Cloud Practitioner & Developer. I am currently enrolled in a Data Science/Machine Learning program.
             </p>
             <p>
               My journey in tech is driven by a passion for creating efficient,
