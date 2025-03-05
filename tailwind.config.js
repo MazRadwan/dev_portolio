@@ -28,9 +28,22 @@ module.exports = {
           800: "#075985",
           900: "#0c4a6e",
         },
-        // Add more custom colors as needed
+        
       },
-      // Add any other theme extensions
+      animation: {
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'glow-pulse': 'glow 1.2s ease-in-out infinite alternate', 
+      },
+      keyframes: {
+        glow: {
+          '0%': { 
+            'box-shadow': '0 0 5px rgba(66, 153, 225, 0.6), 0 0 10px rgba(139, 92, 246, 0.4)'
+          },
+          '100%': { 
+            'box-shadow': '0 0 15px rgba(66, 153, 225, 0.8), 0 0 30px rgba(139, 92, 246, 0.6), 0 0 45px rgba(236, 72, 153, 0.4)'
+          }
+        }
+      },
     },
   },
   plugins: [require("@tailwindcss/typography"), require("@tailwindcss/forms")],

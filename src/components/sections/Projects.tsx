@@ -76,6 +76,7 @@ const projects: Project[] = [
 
 export function Projects() {
   const [playing, setPlaying] = useState<string | null>(null);
+  const [hoveredVideo, setHoveredVideo] = useState<string | null>(null);
 
   // Enhanced animation variants specific for projects
   const projectContainerVariants = {
@@ -158,63 +159,76 @@ export function Projects() {
                 }}
               >
                 {project.links.video ? (
-                  <motion.div 
-                    className="aspect-video relative group cursor-pointer" 
-                    onClick={() => setPlaying(playing === project.id ? null : project.id)}
-                    whileHover={{ 
-                      scale: 1.02,
-                      transition: { duration: 0.2 }
-                    }}
-                  >
-                    <AnimatePresence mode="wait">
-                      {playing === project.id ? (
-                        <motion.iframe
-                          key="video-player"
-                          variants={videoPlayerVariants}
-                          initial="hidden"
-                          animate="visible"
-                          exit="exit"
-                          src={`${getEmbedUrl(project.links.video)}&autoplay=1`}
-                          className="w-full h-full"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      ) : (
-                        <motion.div
-                          key="video-thumbnail"
-                          variants={videoPlayerVariants}
-                          initial="hidden"
-                          animate="visible"
-                          exit="exit"
-                          className="w-full h-full"
-                        >
-                          <img 
-                            src={`https://img.youtube.com/vi/${project.links.video.split('v=')[1]?.split('&')[0]}/mqdefault.jpg`}
-                            alt={project.title}
-                            className="w-full h-full object-cover"
+                  <div className="relative">
+                    {/* Video container with glow effect */}
+                    <div 
+                      className={`absolute -inset-0.5 rounded-t-2xl bg-gradient-to-r from-pink-600 via-purple-500 to-blue-500 opacity-0 transition-opacity duration-300 ${hoveredVideo === project.id ? 'opacity-100' : ''}`}
+                      style={{
+                        filter: 'blur(8px)',
+                        zIndex: 0
+                      }}
+                    />
+                    
+                    <motion.div 
+                      className={`relative z-10 aspect-video cursor-pointer overflow-hidden rounded-t-xl ${hoveredVideo === project.id ? 'animate-glow-pulse' : ''}`}
+                      onHoverStart={() => setHoveredVideo(project.id)} 
+                      onHoverEnd={() => setHoveredVideo(null)}
+                      onClick={() => setPlaying(playing === project.id ? null : project.id)}
+                      whileHover={{ 
+                        scale: 1.02,
+                        transition: { duration: 0.2 }
+                      }}
+                    >
+                      <AnimatePresence mode="wait">
+                        {playing === project.id ? (
+                          <motion.iframe
+                            key="video-player"
+                            variants={videoPlayerVariants}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            src={`${getEmbedUrl(project.links.video)}&autoplay=1`}
+                            className="w-full h-full"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
                           />
-                          <motion.div 
-                            className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors"
-                            initial={{ opacity: 0.8 }}
-                            whileHover={{ opacity: 1 }}
+                        ) : (
+                          <motion.div
+                            key="video-thumbnail"
+                            variants={videoPlayerVariants}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            className="w-full h-full"
                           >
+                            <img 
+                              src={`https://img.youtube.com/vi/${project.links.video.split('v=')[1]?.split('&')[0]}/mqdefault.jpg`}
+                              alt={project.title}
+                              className="w-full h-full object-cover"
+                            />
                             <motion.div 
-                              className="w-16 h-16 flex items-center justify-center rounded-full bg-white/90 group-hover:bg-white transition-colors"
-                              whileHover={{ 
-                                scale: 1.1,
-                                boxShadow: "0 0 20px rgba(255,255,255,0.5)"
-                              }}
-                              whileTap={{ scale: 0.95 }}
+                              className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors"
+                              initial={{ opacity: 0.8 }}
+                              whileHover={{ opacity: 1 }}
                             >
-                              <svg className="w-8 h-8 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M8 5v14l11-7z" />
-                              </svg>
+                              <motion.div 
+                                className="w-16 h-16 flex items-center justify-center rounded-full bg-white/90 group-hover:bg-white transition-colors"
+                                whileHover={{ 
+                                  scale: 1.1,
+                                  boxShadow: "0 0 20px rgba(255,255,255,0.5)"
+                                }}
+                                whileTap={{ scale: 0.95 }}
+                              >
+                                <svg className="w-8 h-8 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M8 5v14l11-7z" />
+                                </svg>
+                              </motion.div>
                             </motion.div>
                           </motion.div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  </div>
                 ) : (
                   <motion.div 
                     className="aspect-[16/9] overflow-hidden"
