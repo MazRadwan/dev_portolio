@@ -74,7 +74,7 @@ export const ABOUT = {
     { name: "AWS Solutions Architect", aws: true },
     { name: "AWS Developer Associate", aws: true },
     { name: "AWS Cloud Practitioner", aws: true },
-    { name: "AI for Cybersecurity (2026)", aws: false },
+    { name: "AI for Cybersecurity (techNL, 2026)", aws: false },
     { name: "ISTQB Certified Tester (QA/QC)", aws: false },
     { name: "EC-Council Cyber-Security Technician", aws: false },
   ],

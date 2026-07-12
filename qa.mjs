@@ -62,7 +62,7 @@ async function runAssertions(page, tag) {
     "AWS Solutions Architect",
     "AWS Developer Associate",
     "AWS Cloud Practitioner",
-    "AI for Cybersecurity (2026)",
+    "AI for Cybersecurity (techNL, 2026)",
     "ISTQB Certified Tester (QA/QC)",
     "EC-Council Cyber-Security Technician",
   ];
