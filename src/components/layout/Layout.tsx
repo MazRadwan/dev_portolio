@@ -1,7 +1,6 @@
-// src/components/layout/Layout.tsx
+import { useState, useEffect } from "react";
 import { Navigation } from "./Navigation";
 import { Footer } from "./Footer";
-import { useState, useEffect } from "react";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -11,19 +10,17 @@ export function Layout({ children }: LayoutProps) {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-
-    window.addEventListener("scroll", handleScroll);
+    const handleScroll = () => setIsScrolled(window.scrollY > 24);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
-    <div className="min-h-screen min-w-full flex flex-col bg-white dark:bg-gray-900">
-  <Navigation isScrolled={isScrolled} />
-  <main className="flex-grow overflow-x-hidden">{children}</main>
-  <Footer />
-</div>
+    <div className="flex min-h-screen flex-col overflow-x-hidden bg-bg">
+      <Navigation isScrolled={isScrolled} />
+      <main className="flex-grow">{children}</main>
+      <Footer />
+    </div>
   );
 }

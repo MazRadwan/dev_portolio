@@ -1,122 +1,91 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Container } from "@/components/ui/Container";
+import { NAV_ITEMS, SITE } from "@/data/site";
 
-interface NavigationProps {
-  isScrolled: boolean;
+function Monogram() {
+  return (
+    <Link
+      href="/"
+      className="group flex items-center gap-2.5"
+      aria-label={`${SITE.name} — home`}
+    >
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect width="32" height="32" rx="8" className="fill-surface-2" />
+        <rect x="0.5" y="0.5" width="31" height="31" rx="7.5" className="stroke-line" />
+        <path d="M9 16 H23" strokeWidth="2" strokeLinecap="round" className="stroke-line-strong" />
+        <path d="M14.5 16 H22" strokeWidth="2" strokeLinecap="round" stroke="var(--accent)" />
+        <circle cx="9" cy="16" r="3.4" fill="var(--accent-2)" />
+        <circle cx="23" cy="16" r="3.4" fill="var(--accent)" />
+      </svg>
+      <span className="mono-label text-ink transition-colors group-hover:text-accent">
+        maz.radwan
+      </span>
+    </Link>
+  );
 }
 
-export function Navigation({ isScrolled }: NavigationProps) {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const navItems = [
-    { name: "About", href: "#about" },
-    { name: "Projects", href: "#projects" },
-    // { name: "Skills", href: "#skills" },
-    { name: "Contact", href: "#contact" },
-  ];
+export function Navigation({ isScrolled }: { isScrolled: boolean }) {
+  const [open, setOpen] = useState(false);
 
   return (
-    <motion.header
-      className={`fixed top-0 w-full z-50 transition-colors duration-300 ${
-        isScrolled || isMobileMenuOpen
-          ? "bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm"
-          : "bg-transparent"
+    <header
+      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
+        isScrolled || open
+          ? "border-b border-line bg-bg/85 backdrop-blur-md"
+          : "border-b border-transparent"
       }`}
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.3 }}
     >
       <Container>
-        <nav className="flex items-center justify-between h-16 sm:h-20">
-          {/* Logo */}
-          <Link
-            href="/"
-            className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
-          >
-            Maz Radwan
-          </Link>
+        <nav className="flex h-16 items-center justify-between">
+          <Monogram />
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            {navItems.map((item) => (
+          <div className="hidden items-center gap-1 md:flex">
+            {NAV_ITEMS.map((item) => (
               <Link
-                key={item.name}
+                key={item.label}
                 href={item.href}
-                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
+                className="mono-label rounded-[var(--radius-chip)] px-3 py-2 text-muted transition-colors hover:text-ink"
               >
-                {item.name}
+                {item.label}
               </Link>
             ))}
+            <div className="mx-2 h-5 w-px bg-line" aria-hidden="true" />
             <ThemeToggle />
-            <motion.a
-              href="/Maz%20Radwan%20FullStack%20Resume.pdf" 
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center px-4 py-2 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-medium hover:bg-gray-700 dark:hover:bg-gray-100 transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Resume
-            </motion.a>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 text-gray-700 dark:text-gray-300"
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          <div className="flex items-center gap-2 md:hidden">
+            <ThemeToggle />
+            <button
+              onClick={() => setOpen((v) => !v)}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius-chip)] border border-line bg-surface-2 text-muted"
+              aria-label={open ? "Close menu" : "Open menu"}
+              aria-expanded={open}
+            >
+              {open ? <X size={18} /> : <Menu size={18} />}
+            </button>
+          </div>
         </nav>
 
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-            className="md:hidden py-4 bg-white dark:bg-gray-900 border-t dark:border-gray-800"
-          >
-            <div className="flex flex-col gap-4">
-              {navItems.map((item, index) => (
-                <motion.div
-                  key={item.name}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
+        {open && (
+          <div className="pb-4 md:hidden">
+            <div className="flex flex-col gap-1 border-t border-line pt-3">
+              {NAV_ITEMS.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className="mono-label rounded-[var(--radius-chip)] px-3 py-2.5 text-muted transition-colors hover:bg-surface-2 hover:text-ink"
                 >
-                  <Link
-                    href={item.href}
-                    className="text-base font-medium text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors px-4 py-2 block"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {item.name}
-                  </Link>
-                </motion.div>
+                  {item.label}
+                </Link>
               ))}
-              <div className="px-4 pt-2 border-t dark:border-gray-800 flex items-center justify-between">
-                <ThemeToggle />
-                <motion.a
-                  href="/Maz%20Radwan%20FullStack%20Resume.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center px-4 py-2 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-medium hover:bg-gray-700 dark:hover:bg-gray-100 transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Resume
-                </motion.a>
-              </div>
             </div>
-          </motion.div>
+          </div>
         )}
       </Container>
-    </motion.header>
+    </header>
   );
 }

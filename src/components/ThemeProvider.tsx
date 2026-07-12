@@ -10,23 +10,24 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark"); // Changed default to 'dark'
+  // Dark is the primary theme. The inline script in _document sets the class
+  // before paint; here we mirror it into React state after mount.
+  const [theme, setTheme] = useState<Theme>("dark");
 
   useEffect(() => {
-    // Check localStorage first, if not found use dark as default
-    const savedTheme = (localStorage.getItem("theme") as Theme) || "dark";
-    setTheme(savedTheme);
-
-    // Add dark class to html element by default
-    document.documentElement.classList.add("dark");
+    const stored = localStorage.getItem("theme") as Theme | null;
+    const active = document.documentElement.classList.contains("dark")
+      ? "dark"
+      : "light";
+    setTheme(stored ?? active);
   }, []);
 
   const toggleTheme = () => {
-    setTheme((prevTheme) => {
-      const newTheme = prevTheme === "light" ? "dark" : "light";
-      localStorage.setItem("theme", newTheme);
-      document.documentElement.classList.toggle("dark");
-      return newTheme;
+    setTheme((prev) => {
+      const next: Theme = prev === "dark" ? "light" : "dark";
+      localStorage.setItem("theme", next);
+      document.documentElement.classList.toggle("dark", next === "dark");
+      return next;
     });
   };
 

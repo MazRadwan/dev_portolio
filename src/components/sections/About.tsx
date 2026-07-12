@@ -1,151 +1,60 @@
-import React from "react";
-import { motion } from "framer-motion";
-import { Section } from "@/components/ui/Section";
-import { BookOpen, Code2, Globe, Laptop } from "lucide-react";
-
-interface ExperienceCardProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}
-
-function ExperienceCard({ icon, title, description }: ExperienceCardProps) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      className="flex gap-4 p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/50"
-    >
-      <div className="flex-shrink-0">
-        <div className="p-3 rounded-lg bg-primary-100 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400">
-          {icon}
-        </div>
-      </div>
-      <div>
-        <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-          {title}
-        </h3>
-        <p className="text-gray-600 dark:text-gray-400 text-sm">
-          {description}
-        </p>
-      </div>
-    </motion.div>
-  );
-}
+import { Container } from "@/components/ui/Container";
+import { Reveal } from "@/components/ui/Reveal";
+import { ABOUT } from "@/data/site";
 
 export function About() {
-  const experiences = [
-    {
-      icon: <Code2 className="w-6 h-6" />,
-      title: "Full Stack Development",
-      description:
-        "Experienced in both frontend and backend development with modern technologies.",
-    },
-    {
-      icon: <Globe className="w-6 h-6" />,
-      title: "AWS Cloud Services",
-      description:
-        "Proficient in cloud architecture and AWS services implementation.",
-    },
-    {
-      icon: <Laptop className="w-6 h-6" />,
-      title: "Quality Assurance",
-      description: "Certified in QA/QC methodologies and testing practices.",
-    },
-    {
-      icon: <BookOpen className="w-6 h-6" />,
-      title: "Continuous Learning",
-      description:
-        "Passionate about learning new technologies and best practices.",
-    },
-  ];
-
   return (
-    <Section id="about">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        {/* Text Content */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          className="space-y-6"
-        >
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
-              About Me
-            </h2>
-            <p className="text-lg text-primary-600 dark:text-primary-400">
-              Software Developer & AWS Cloud Practitioner
-            </p>
+    <section id="about" className="scroll-mt-20 border-t border-line py-20 md:py-28">
+      <Container>
+        <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+          {/* Header rail */}
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <Reveal>
+              <div className="mono-label mb-4 flex items-center gap-2.5 text-accent">
+                <span className="h-px w-6 bg-accent" aria-hidden="true" />
+                profile
+              </div>
+              <h2 className="font-display text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl">
+                Enterprise systems, built with a disciplined agentic practice.
+              </h2>
+              <p className="mono-label mt-6 leading-relaxed text-faint">{ABOUT.credentials}</p>
+            </Reveal>
           </div>
 
-          <div className="space-y-4 text-gray-600 dark:text-gray-400">
-            <p>
-              I'm a software developer, with a strong foundation in full-stack development and
-              cloud technologies. I am a certified Quality Assurance/Quality Control Tester, and 
-              a certified AWS Cloud Practitioner & Developer. I am currently enrolled in a Data Science/Machine Learning program.
-            </p>
-            <p>
-              My journey in tech is driven by a passion for creating efficient,
-              user-friendly solutions. I combine my technical skills with my
-              background in art and design to build applications that are both
-              functional and visually appealing.
-            </p>
-            <p>Currently focusing on expanding my expertise in:</p>
-            <ul className="list-disc list-inside space-y-2 ml-4">
-              <li>Advanced React patterns and best practices</li>
-              <li>Cloud architecture and AWS services</li>
-              <li>Data structures and algorithms</li>
-              <li>Data Science and Machine Learning</li>
-              <li>Cybersecurity fundamentals</li>
-            </ul>
-          </div>
-
-          {/* Tech Stack Section */}
-          <div className="pt-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-              Current Tech Stack
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {[
-                "React",
-                "Node.js",
-                "JavaScript",
-                "AWS",
-                "PostgreSQL",
-                "ExpressJS",
-                "Next.js",
-                "MongoDB",
-                "MySQL",
-                "Docker",
-                "Tailwind CSS",
-                "HTML/CSS",
-                "Python",
-              ].map((tech) => (
-                <span
-                  key={tech}
-                  className="px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm"
+          {/* Records */}
+          <div className="overflow-hidden rounded-[var(--radius-panel)] border border-line bg-surface/60">
+            {ABOUT.paras.map((para, i) => (
+              <Reveal key={para.label} delay={i * 0.06}>
+                <article
+                  className={`grid gap-3 p-6 sm:grid-cols-[8rem_1fr] sm:gap-6 sm:p-7 ${
+                    i !== 0 ? "border-t border-line" : ""
+                  }`}
                 >
-                  {tech}
-                </span>
-              ))}
-            </div>
+                  <div className="mono-label pt-1 text-faint">
+                    <span className="text-accent">{String(i + 1).padStart(2, "0")}</span> · {para.label}
+                  </div>
+                  <p className="text-[15px] leading-relaxed text-muted">{para.body}</p>
+                </article>
+              </Reveal>
+            ))}
           </div>
-        </motion.div>
+        </div>
 
-        {/* Experience Cards */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-4"
-        >
-          {experiences.map((experience, index) => (
-            <ExperienceCard key={experience.title} {...experience} />
-          ))}
-        </motion.div>
-      </div>
-    </Section>
+        {/* Tech stack */}
+        <Reveal className="mt-14">
+          <div className="mono-label mb-5 text-faint">stack · tooling</div>
+          <div className="flex flex-wrap gap-2.5">
+            {ABOUT.chips.map((chip) => (
+              <span
+                key={chip}
+                className="mono-label rounded-[var(--radius-chip)] border border-line bg-surface-2 px-3 py-2 text-muted transition-colors hover:border-accent/40 hover:text-ink"
+              >
+                {chip}
+              </span>
+            ))}
+          </div>
+        </Reveal>
+      </Container>
+    </section>
   );
 }

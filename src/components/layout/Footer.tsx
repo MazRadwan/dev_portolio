@@ -1,151 +1,80 @@
-import React from "react";
 import Link from "next/link";
-import { Github, Linkedin, Mail, Twitter } from "lucide-react";
+import { Github, Linkedin } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-
-interface FooterLinkProps {
-  href: string;
-  children: React.ReactNode;
-}
-
-function FooterLink({ href, children }: FooterLinkProps) {
-  return (
-    <a
-      href={href}
-      className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      {children}
-    </a>
-  );
-}
-
-function SocialLinks() {
-  return (
-    <div className="flex items-center space-x-6">
-      <FooterLink href="https://github.com/MazRadwan">
-        <span className="sr-only">GitHub</span>
-        <Github className="w-6 h-6" />
-      </FooterLink>
-      <FooterLink href="https://linkedin.com/in/maz-radwan">
-        <span className="sr-only">LinkedIn</span>
-        <Linkedin className="w-6 h-6" />
-      </FooterLink>
-  
-      <FooterLink href="mazradwan@icloud.com">
-        <span className="sr-only">Email</span>
-        <Mail className="w-6 h-6" />
-      </FooterLink>
-    </div>
-  );
-}
+import { NAV_ITEMS, SITE } from "@/data/site";
 
 export function Footer() {
-  const currentYear = new Date().getFullYear();
-
-  const footerNavItems = [
-    { name: "About", href: "#about" },
-    { name: "Projects", href: "#projects" },
-    // { name: "Skills", href: "#skills" },
-    { name: "Contact", href: "#contact" },
-  ];
+  const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-32 bg-white dark:bg-gray-900">
+    <footer className="border-t border-line">
       <Container>
-        <div className="py-16">
-          {/* Main footer content */}
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-            {/* Brand and description */}
-            <div className="space-y-4">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                Maz Radwan
-              </h2>
-              <p className="max-w-xs text-gray-600 dark:text-gray-400">
-                Full-stack developer passionate about creating innovative and
-                user-friendly web applications.
+        <div className="flex flex-col gap-10 py-14">
+          <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
+            {/* Brand */}
+            <div className="max-w-sm">
+              <div className="flex items-center gap-2.5">
+                <svg width="24" height="24" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                  <rect width="32" height="32" rx="8" className="fill-surface-2" />
+                  <rect x="0.5" y="0.5" width="31" height="31" rx="7.5" className="stroke-line" />
+                  <path d="M9 16 H23" strokeWidth="2" strokeLinecap="round" className="stroke-line-strong" />
+                  <path d="M14.5 16 H22" strokeWidth="2" strokeLinecap="round" stroke="var(--accent)" />
+                  <circle cx="9" cy="16" r="3.4" fill="var(--accent-2)" />
+                  <circle cx="23" cy="16" r="3.4" fill="var(--accent)" />
+                </svg>
+                <span className="mono-label text-ink">maz.radwan</span>
+              </div>
+              <p className="mt-4 text-sm leading-relaxed text-muted">
+                {SITE.role} — {SITE.focus}. Building AI-integrated enterprise systems for provincial
+                healthcare.
               </p>
-              <SocialLinks />
             </div>
 
-            {/* Navigation */}
-            <nav className="lg:col-span-2 grid grid-cols-2 gap-8">
-              {/* Site Links */}
-              <div>
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">
-                  Navigation
-                </h3>
-                <ul className="mt-4 space-y-4">
-                  {footerNavItems.map((item) => (
-                    <li key={item.name}>
-                      <Link
-                        href={item.href}
-                        className="text-base text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-                      >
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+            {/* Nav + social */}
+            <div className="flex flex-col gap-6 sm:flex-row sm:gap-16">
+              <nav aria-label="Footer" className="flex flex-col gap-3">
+                <span className="mono-label text-faint">navigate</span>
+                {NAV_ITEMS.map((item) => (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className="text-sm text-muted transition-colors hover:text-ink"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
 
-              {/* Contact Info */}
-              <div>
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">
-                  Contact
-                </h3>
-                <ul className="mt-4 space-y-4">
-                  <li>
-                    <a
-                      href="mailto:mazradwan@icloud.com"
-                      className="text-base text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-                    >
-                      mazradwan@icloud.com
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="/Maz%20Radwan%20FullStack%20Resume.pdf" 
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-base text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-                    >
-                      View Resume
-                    </a>
-                  </li>
-                </ul>
+              <div className="flex flex-col gap-3">
+                <span className="mono-label text-faint">connect</span>
+                <div className="flex items-center gap-3">
+                  <a
+                    href={SITE.social.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius-chip)] border border-line text-muted transition-colors hover:border-accent/50 hover:text-ink"
+                  >
+                    <span className="sr-only">GitHub</span>
+                    <Github size={16} />
+                  </a>
+                  <a
+                    href={SITE.social.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius-chip)] border border-line text-muted transition-colors hover:border-accent/50 hover:text-ink"
+                  >
+                    <span className="sr-only">LinkedIn</span>
+                    <Linkedin size={16} />
+                  </a>
+                </div>
               </div>
-            </nav>
+            </div>
           </div>
 
-          {/* Bottom bar */}
-          <div className="pt-8 mt-12 border-t border-gray-200 dark:border-gray-800">
-            <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                © {currentYear} Maz Radwan. All rights reserved.
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Built with{" "}
-                <a
-                  href="https://nextjs.org"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium hover:text-gray-900 dark:hover:text-white transition-colors"
-                >
-                  Next.js
-                </a>{" "}
-                and{" "}
-                <a
-                  href="https://tailwindcss.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium hover:text-gray-900 dark:hover:text-white transition-colors"
-                >
-                  Tailwind CSS
-                </a>
-              </p>
-            </div>
+          {/* Status bar */}
+          <div className="flex flex-col gap-3 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
+            <p className="mono-label text-faint">© {year} {SITE.name}</p>
+            <p className="mono-label text-faint">built with next.js · tailwind css</p>
           </div>
         </div>
       </Container>
