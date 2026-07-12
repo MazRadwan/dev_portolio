@@ -1,68 +1,215 @@
-/* src/styles/globals.css */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Class-based dark mode driven by ThemeProvider toggling `.dark` on <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  RELAY — dark enterprise operations console.
+  Base is a deep desaturated navy-indigo (never pure black). The accent is a
+  duotone: signal teal-cyan (systems / access / verified) and warm coral
+  (identity / human / attention). Type pairs Hanken Grotesk (humanist grotesk)
+  with IBM Plex Mono (terminal / data), loaded self-hosted via next/font.
+*/
+
+@theme {
+  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", monospace;
+
+  --radius-panel: 14px;
+  --radius-card: 12px;
+  --radius-chip: 7px;
+
+  --ease-console: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/*
+  Semantic surface + accent tokens flip by theme. `@theme inline` makes the
+  generated utilities (bg-surface, text-ink, border-line, text-accent, …)
+  reference the live variables so they update when `.dark` toggles.
+*/
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-elevated: var(--elevated);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-2: var(--accent-2);
+  --color-accent-2-soft: var(--accent-2-soft);
+  --color-on-accent: var(--on-accent);
+  --color-grid: var(--grid);
+}
+
+/* Light theme — "daylight console": cool paper, navy ink, tuned accents. */
+:root {
+  --bg: #e9edf4;
+  --surface: #f6f8fc;
+  --surface-2: #ffffff;
+  --elevated: #ffffff;
+  --line: #d3dae6;
+  --line-strong: #bcc6d6;
+  --ink: #0f1626;
+  --muted: #46536b;
+  --faint: #59647a;
+  --accent: #0b8474;
+  --accent-soft: rgba(11, 132, 116, 0.1);
+  --accent-2: #d1502c;
+  --accent-2-soft: rgba(209, 80, 44, 0.1);
+  --on-accent: #ffffff;
+  --grid: rgba(15, 22, 38, 0.045);
+
+  color-scheme: light;
+}
+
+/* Dark theme — primary. Deep navy-indigo base, elevated console panels. */
+.dark {
+  --bg: #0a0e17;
+  --surface: #10151f;
+  --surface-2: #161c2a;
+  --elevated: #1a2233;
+  --line: #232b3d;
+  --line-strong: #313c53;
+  --ink: #e9edf6;
+  --muted: #98a3b9;
+  --faint: #626e86;
+  --accent: #38e0c9;
+  --accent-soft: rgba(56, 224, 201, 0.11);
+  --accent-2: #ff8163;
+  --accent-2-soft: rgba(255, 129, 99, 0.12);
+  --on-accent: #06121a;
+  --grid: rgba(120, 145, 190, 0.05);
+
+  color-scheme: dark;
+}
 
 @layer base {
   html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
-    @apply antialiased text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-900;
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
-  /* Typography */
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply font-bold tracking-tight;
+  ::selection {
+    background-color: var(--accent);
+    color: #06121a;
   }
 
-  h1 {
-    @apply text-4xl sm:text-5xl md:text-6xl;
+  /* Keyboard focus — visible signal ring in the accent color. */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 3px;
   }
 
-  h2 {
-    @apply text-3xl sm:text-4xl;
+  ::-webkit-scrollbar {
+    width: 11px;
+    height: 11px;
   }
-
-  h3 {
-    @apply text-2xl sm:text-3xl;
+  ::-webkit-scrollbar-track {
+    background: var(--bg);
   }
-
-  /* Section spacing */
-  section {
-    @apply py-20;
+  ::-webkit-scrollbar-thumb {
+    background: var(--line-strong);
+    border: 3px solid var(--bg);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--faint);
   }
 }
 
 @layer components {
-  .btn {
-    @apply inline-flex items-center justify-center px-4 py-2 rounded-full font-medium transition-colors;
+  /* Monospace utility label — the console voice used for eyebrows and data. */
+  .mono-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 500;
   }
 
-  .btn-primary {
-    @apply bg-indigo-600 text-white hover:bg-indigo-700;
+  /* Faint blueprint grid used behind the hero readout. */
+  .grid-field {
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 34px 34px;
   }
 
-  .btn-secondary {
-    @apply bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700;
+  /* Live status dot with a soft radar pulse. */
+  .pulse-dot {
+    position: relative;
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--accent);
+  }
+  .pulse-dot::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: 999px;
+    border: 1px solid var(--accent);
+    animation: relay-pulse 2.4s var(--ease-console) infinite;
   }
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  @apply w-2;
+@keyframes relay-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  70% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
-::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-gray-800;
+/* Token traveling the identity-flow trace in the hero readout. */
+@keyframes relay-trace {
+  0% {
+    left: 0%;
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
 }
 
-::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 dark:bg-gray-700 rounded-full;
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }

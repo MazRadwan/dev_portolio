@@ -4,18 +4,22 @@ export default function Document() {
   return (
     <Html lang="en" className="dark">
       <Head>
-        {/* Prevent flash of light mode */}
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <meta name="theme-color" content="#0a0e17" />
+        {/* Set the theme class before paint to avoid a flash. Dark is default. */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              if (localStorage.getItem('theme') === 'light') {
-                document.documentElement.classList.remove('dark')
-              }
+              try {
+                if (localStorage.getItem('theme') === 'light') {
+                  document.documentElement.classList.remove('dark');
+                }
+              } catch (e) {}
             `,
           }}
         />
       </Head>
-      <body className="bg-white dark:bg-gray-900">
+      <body>
         <Main />
         <NextScript />
       </body>
