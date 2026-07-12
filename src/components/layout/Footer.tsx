@@ -74,7 +74,7 @@ export function Footer() {
           {/* Status bar */}
           <div className="flex flex-col gap-3 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
             <p className="mono-label text-faint">© {year} {SITE.name}</p>
-            <p className="mono-label text-faint">built with next.js · tailwind css</p>
+            <p className="mono-label text-faint">{SITE.location}</p>
           </div>
         </div>
       </Container>

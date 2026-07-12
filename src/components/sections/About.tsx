@@ -15,9 +15,8 @@ export function About() {
                 profile
               </div>
               <h2 className="font-display text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl">
-                Enterprise systems, built with a disciplined agentic practice.
+                Enterprise systems, built through a disciplined agentic practice.
               </h2>
-              <p className="mono-label mt-6 leading-relaxed text-faint">{ABOUT.credentials}</p>
             </Reveal>
           </div>
 
@@ -50,6 +49,28 @@ export function About() {
                 className="mono-label rounded-[var(--radius-chip)] border border-line bg-surface-2 px-3 py-2 text-muted transition-colors hover:border-accent/40 hover:text-ink"
               >
                 {chip}
+              </span>
+            ))}
+          </div>
+        </Reveal>
+
+        {/* Certifications — AWS credentials emphasized */}
+        <Reveal className="mt-10">
+          <div className="mono-label mb-5 text-faint">certifications</div>
+          <div className="flex flex-wrap gap-2.5">
+            {ABOUT.certs.map((cert) => (
+              <span
+                key={cert.name}
+                className={
+                  cert.aws
+                    ? "mono-label inline-flex items-center gap-2 rounded-[var(--radius-chip)] border border-accent/45 bg-accent-soft px-3 py-2 text-ink"
+                    : "mono-label rounded-[var(--radius-chip)] border border-line bg-surface-2 px-3 py-2 text-muted"
+                }
+              >
+                {cert.aws && (
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+                )}
+                {cert.name}
               </span>
             ))}
           </div>

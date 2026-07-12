@@ -43,7 +43,7 @@ export const ABOUT = {
   paras: [
     {
       label: "Role",
-      body: "Senior Programmer/Analyst at a Newfoundland and Labrador provincial health authority, working in a large enterprise .NET codebase. I build full-stack, AI-integrated compliance and clinical-safety reporting systems, and I'm on the team building the internal enterprise identity & access management platform — primarily backend and systems integration across enterprise clinical and HR systems.",
+      body: "Senior Programmer/Analyst at a Newfoundland and Labrador provincial health authority, working in a large enterprise .NET codebase. I build full-stack, AI-integrated compliance and clinical-safety reporting systems, and I'm on the team building the internal enterprise identity & access management platform — primarily backend and systems integration across enterprise clinical and HR systems, with integration and deployment spanning Azure and AWS.",
     },
     {
       label: "Practice",
@@ -58,6 +58,7 @@ export const ABOUT = {
     "C# / .NET",
     "SQL Server",
     "Azure & Entra ID",
+    "AWS",
     "gRPC",
     "REST APIs",
     "Node.js / TypeScript",
@@ -68,7 +69,15 @@ export const ABOUT = {
     "MCP",
     "React",
   ],
-  credentials: "AI for Cybersecurity (2026) · AWS Cloud Practitioner & Developer · QA/QC certified",
+  // Order per spec; AWS certs get emphasis in the UI.
+  certs: [
+    { name: "AWS Solutions Architect", aws: true },
+    { name: "AWS Developer Associate", aws: true },
+    { name: "AWS Cloud Practitioner", aws: true },
+    { name: "AI for Cybersecurity (2026)", aws: false },
+    { name: "ISTQB Certified Tester (QA/QC)", aws: false },
+    { name: "EC-Council Cyber-Security Technician", aws: false },
+  ],
 } as const;
 
 export type Project = {
