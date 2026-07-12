@@ -101,7 +101,7 @@ export function Projects() {
       y: 0,
       scale: 1,
       transition: { 
-        type: "spring", 
+        type: "spring" as const, 
         stiffness: 100, 
         damping: 12, 
         duration: 0.5 
@@ -115,7 +115,7 @@ export function Projects() {
       opacity: 1, 
       scale: 1,
       transition: { 
-        type: "spring", 
+        type: "spring" as const, 
         stiffness: 200, 
         damping: 20 
       }
