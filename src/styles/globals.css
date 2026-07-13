@@ -4,21 +4,20 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
-  RELAY — dark enterprise operations console.
-  Base is a deep desaturated navy-indigo (never pure black). The accent is a
-  duotone: signal teal-cyan (systems / access / verified) and warm coral
-  (identity / human / attention). Type pairs Hanken Grotesk (humanist grotesk)
-  with IBM Plex Mono (terminal / data), loaded self-hosted via next/font.
+  RELAY — an identity & access operations console rendered as a proper TUI.
+  Monospace (IBM Plex Mono) carries the entire structural layer; the humanist
+  grotesk (Hanken) is reserved for long-form reading only. Deep navy base with a
+  teal/coral duotone — deliberately NOT the green-phosphor terminal cliché.
+  Square everything: this is a terminal, not a card deck.
 */
 
 @theme {
-  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", monospace;
-
-  --radius-panel: 14px;
-  --radius-card: 12px;
-  --radius-chip: 7px;
+  /* --app-mono / --app-prose are the real next/font family names, defined on
+     :root in _app so they resolve globally (not just under a wrapper div). */
+  --font-sans: var(--app-mono), ui-monospace, "SF Mono", Menlo, monospace;
+  --font-mono: var(--app-mono), ui-monospace, "SF Mono", Menlo, monospace;
+  /* Grotesk, opt-in via `.prose-face`, only for paragraphs of real prose. */
+  --font-prose: var(--app-prose), ui-sans-serif, system-ui, sans-serif;
 
   --ease-console: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
@@ -46,44 +45,45 @@
   --color-grid: var(--grid);
 }
 
-/* Light theme — "daylight console": cool paper, navy ink, tuned accents. */
+/* Light theme — a light terminal palette (Solarized-light lineage): cool paper,
+   navy ink, tuned accents. Square and mono like the dark theme, just inverted. */
 :root {
-  --bg: #e9edf4;
-  --surface: #f6f8fc;
-  --surface-2: #ffffff;
+  --bg: #e7ebf2;
+  --surface: #f4f6fb;
+  --surface-2: #fbfcfe;
   --elevated: #ffffff;
-  --line: #d3dae6;
-  --line-strong: #bcc6d6;
-  --ink: #0f1626;
-  --muted: #46536b;
-  --faint: #59647a;
-  --accent: #0b8474;
-  --accent-soft: rgba(11, 132, 116, 0.1);
-  --accent-2: #d1502c;
-  --accent-2-soft: rgba(209, 80, 44, 0.1);
-  --on-accent: #ffffff;
-  --grid: rgba(15, 22, 38, 0.045);
+  --line: #cad3e0;
+  --line-strong: #aab6c9;
+  --ink: #10192a;
+  --muted: #45536b;
+  --faint: #566476;
+  --accent: #0a7d6e;
+  --accent-soft: rgba(10, 125, 110, 0.12);
+  --accent-2: #cf4e2b;
+  --accent-2-soft: rgba(207, 78, 43, 0.12);
+  --on-accent: #f4f6fb;
+  --grid: rgba(16, 25, 42, 0.05);
 
   color-scheme: light;
 }
 
-/* Dark theme — primary. Deep navy-indigo base, elevated console panels. */
+/* Dark theme — primary. Deep navy-indigo terminal, never pure black. */
 .dark {
   --bg: #0a0e17;
   --surface: #10151f;
   --surface-2: #161c2a;
   --elevated: #1a2233;
   --line: #232b3d;
-  --line-strong: #313c53;
+  --line-strong: #33405a;
   --ink: #e9edf6;
   --muted: #98a3b9;
-  --faint: #626e86;
+  --faint: #66738c;
   --accent: #38e0c9;
-  --accent-soft: rgba(56, 224, 201, 0.11);
+  --accent-soft: rgba(56, 224, 201, 0.12);
   --accent-2: #ff8163;
-  --accent-2-soft: rgba(255, 129, 99, 0.12);
+  --accent-2-soft: rgba(255, 129, 99, 0.13);
   --on-accent: #06121a;
-  --grid: rgba(120, 145, 190, 0.05);
+  --grid: rgba(120, 145, 190, 0.055);
 
   color-scheme: dark;
 }
@@ -97,27 +97,27 @@
   body {
     background-color: var(--bg);
     color: var(--ink);
-    font-family: var(--font-sans);
+    font-family: var(--app-mono), ui-monospace, "SF Mono", Menlo, monospace;
+    font-feature-settings: "liga" 0; /* keep glyphs literal, terminal-like */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
   }
 
   ::selection {
     background-color: var(--accent);
-    color: #06121a;
+    color: var(--on-accent);
   }
 
-  /* Keyboard focus — visible signal ring in the accent color. */
+  /* Keyboard focus — a square terminal-style focus box. */
   :focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
-    border-radius: 3px;
+    border-radius: 0;
   }
 
   ::-webkit-scrollbar {
-    width: 11px;
-    height: 11px;
+    width: 12px;
+    height: 12px;
   }
   ::-webkit-scrollbar-track {
     background: var(--bg);
@@ -125,7 +125,6 @@
   ::-webkit-scrollbar-thumb {
     background: var(--line-strong);
     border: 3px solid var(--bg);
-    border-radius: 999px;
   }
   ::-webkit-scrollbar-thumb:hover {
     background: var(--faint);
@@ -133,49 +132,113 @@
 }
 
 @layer components {
-  /* Monospace utility label — the console voice used for eyebrows and data. */
+  /* The prose escape hatch: humanist grotesk for paragraphs of real reading. */
+  .prose-face {
+    font-family: var(--app-prose), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  /* Uppercase tracked mono label — the console's structural voice. */
   .mono-label {
-    font-family: var(--font-mono);
     font-size: 0.72rem;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     font-weight: 500;
   }
 
-  /* Faint blueprint grid used behind the hero readout. */
+  /* Framed terminal pane: square border + accent corner ticks (top-left,
+     bottom-right) that read as ┌ … ┘ without fragile glyph alignment. */
+  .term-frame {
+    position: relative;
+    border: 1px solid var(--line);
+    background: color-mix(in oklab, var(--surface) 82%, transparent);
+  }
+  .term-frame::before,
+  .term-frame::after {
+    content: "";
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border-color: var(--accent);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  .term-frame::before {
+    top: -1px;
+    left: -1px;
+    border-top: 1px solid;
+    border-left: 1px solid;
+  }
+  .term-frame::after {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 1px solid;
+    border-right: 1px solid;
+  }
+
+  /* Faint scan grid behind the hero pane. */
   .grid-field {
     background-image:
       linear-gradient(var(--grid) 1px, transparent 1px),
       linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-    background-size: 34px 34px;
+    background-size: 30px 30px;
   }
 
-  /* Live status dot with a soft radar pulse. */
-  .pulse-dot {
+  /* Dotted leader that fills the gap in a `label ...... value` row. */
+  .leader {
+    flex: 1 1 auto;
+    align-self: center;
+    height: 0;
+    border-bottom: 1px dotted color-mix(in oklab, var(--faint) 70%, transparent);
+    margin: 0 0.6rem;
+    transform: translateY(-1px);
+  }
+
+  /* Deliberate block cursor. */
+  .block-cursor {
+    display: inline-block;
+    width: 0.56em;
+    height: 1.02em;
+    margin-left: 0.08em;
+    background: var(--accent);
+    vertical-align: -0.14em;
+    animation: tui-blink 1.15s steps(1) infinite;
+  }
+
+  /* Live square indicator with a soft expanding ring. */
+  .pulse-sq {
     position: relative;
     display: inline-block;
     width: 7px;
     height: 7px;
-    border-radius: 999px;
     background: var(--accent);
   }
-  .pulse-dot::after {
+  .pulse-sq::after {
     content: "";
     position: absolute;
     inset: -3px;
-    border-radius: 999px;
     border: 1px solid var(--accent);
-    animation: relay-pulse 2.4s var(--ease-console) infinite;
+    animation: tui-pulse 2.4s var(--ease-console) infinite;
   }
 }
 
-@keyframes relay-pulse {
+@keyframes tui-blink {
+  0%,
+  48% {
+    opacity: 1;
+  }
+  49%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes tui-pulse {
   0% {
-    transform: scale(0.6);
+    transform: scale(0.7);
     opacity: 0.9;
   }
   70% {
-    transform: scale(2.4);
+    transform: scale(2.3);
     opacity: 0;
   }
   100% {
@@ -183,16 +246,16 @@
   }
 }
 
-/* Token traveling the identity-flow trace in the hero readout. */
-@keyframes relay-trace {
+/* Token traveling the identity-lifecycle pipeline. */
+@keyframes tui-trace {
   0% {
     left: 0%;
     opacity: 0;
   }
-  8% {
+  10% {
     opacity: 1;
   }
-  92% {
+  90% {
     opacity: 1;
   }
   100% {
