@@ -107,8 +107,6 @@ export function Contact() {
               <form
                 name="contact"
                 method="POST"
-                data-netlify="true"
-                data-netlify-honeypot="bot-field"
                 className="space-y-5"
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -119,7 +117,7 @@ export function Contact() {
                   formData.append("form-name", "contact");
                   formData.append("bot-field", (formData.get("bot-field") as string) || "");
 
-                  fetch("/", {
+                  fetch("/__forms.html", {
                     method: "POST",
                     headers: { "Content-Type": "application/x-www-form-urlencoded" },
                     body: new URLSearchParams(formData as any).toString(),

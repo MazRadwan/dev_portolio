@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head><meta charset="utf-8"><title>Netlify Forms definition</title></head>
+  <body>
+    <!-- Static form definition for Netlify build-time detection (Next Runtime v5
+         forms migration: https://ntl.fyi/next-runtime-forms-migration).
+         The React contact form POSTs URL-encoded data to /__forms.html. -->
+    <form name="contact" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+      <textarea name="message"></textarea>
+      <input name="bot-field" />
+    </form>
+  </body>
+</html>

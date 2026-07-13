@@ -107,8 +107,7 @@ async function assertContent(page, tag) {
 
   const formOk = await page.evaluate(() => {
     const f = document.querySelector('form[name="contact"]');
-    return !!(f && f.getAttribute("data-netlify") === "true" &&
-      f.querySelector('input[name="bot-field"]') && f.querySelector('input[name="form-name"]'));
+    return !!(f && f.querySelector('input[name="bot-field"]') && f.querySelector('input[name="form-name"]'));
   });
   if (!formOk) note(tag, `contact form missing Netlify wiring`);
 
