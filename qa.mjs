@@ -87,6 +87,15 @@ async function assertContent(page, tag) {
   if (!certTableText.includes("techNL")) note(tag, `certs table missing issuer techNL`);
   if (!certTableText.includes("2026")) note(tag, `certs table missing year 2026`);
 
+  // Identity: the h1's accessible name is stable and the full name is in the DOM
+  // regardless of the typing animation's current frame.
+  const h1 = await page.$eval("h1", (el) => ({
+    label: el.getAttribute("aria-label"),
+    text: el.textContent || "",
+  }));
+  if (h1.label !== "Maz Radwan") note(tag, `h1 aria-label = "${h1.label}", expected "Maz Radwan"`);
+  if (!h1.text.includes("Maz Radwan")) note(tag, `h1 missing full name in DOM`);
+
   const headings = await page.$$eval("#projects article h3", (els) =>
     els.map((e) => e.textContent?.trim()).filter(Boolean)
   );
@@ -115,6 +124,8 @@ async function assertNoJs(engine, tag) {
   await page.goto(BASE, { waitUntil: "load" });
   const h1 = (await visibleInfo(page, "h1"))[0];
   if (!h1 || h1.opacity < 0.99 || h1.w < 1 || h1.h < 1) note(tag, `h1 not visible without JS: ${JSON.stringify(h1)}`);
+  const nameText = await page.$eval("h1", (el) => el.textContent || "").catch(() => "");
+  if (!nameText.includes("Maz Radwan")) note(tag, `h1 missing full name without JS`);
   const cards = await visibleInfo(page, "#projects article h3");
   if (cards.length !== 5) note(tag, `expected 5 cards without JS, got ${cards.length}`);
   cards.forEach((c, i) => {
@@ -168,8 +179,9 @@ async function runViewport(engine, contextOpts, theme, tag, { screenshots }) {
   page.on("response", (r) => { if (r.status() >= 400 && r.url().startsWith(BASE)) note(tag, `http ${r.status()}: ${r.url()}`); });
 
   await page.goto(BASE, { waitUntil: "networkidle" });
-  // Let the hero boot sequence settle into its resolved state before shooting.
-  await page.waitForTimeout(screenshots ? 2100 : 400);
+  // Settle: the console boots (~1.5s) and the name completes its first type-out
+  // and enters the hold, so screenshots show the full name + resolved console.
+  await page.waitForTimeout(screenshots ? 4200 : 500);
 
   const isDark = await page.evaluate(() => document.documentElement.classList.contains("dark"));
   if ((theme === "dark") !== isDark) note(tag, `theme class mismatch (isDark=${isDark})`);
