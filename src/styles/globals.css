@@ -37,6 +37,7 @@
   --color-ink: var(--ink);
   --color-muted: var(--muted);
   --color-faint: var(--faint);
+  --color-faint-glyph: var(--faint-glyph);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
   --color-accent-2: var(--accent-2);
@@ -57,6 +58,7 @@
   --ink: #10192a;
   --muted: #45536b;
   --faint: #566476;
+  --faint-glyph: #9aa6b8; /* decorative-only */
   --accent: #0a7d6e;
   --accent-soft: rgba(10, 125, 110, 0.12);
   --accent-2: #cf4e2b;
@@ -77,7 +79,8 @@
   --line-strong: #33405a;
   --ink: #e9edf6;
   --muted: #98a3b9;
-  --faint: #66738c;
+  --faint: #7b879f; /* WCAG AA (>=4.5:1) on surfaces for small text */
+  --faint-glyph: #586377; /* decorative-only: brackets, rules, aria-hidden glyphs */
   --accent: #38e0c9;
   --accent-soft: rgba(56, 224, 201, 0.12);
   --accent-2: #ff8163;
@@ -137,12 +140,71 @@
     font-family: var(--app-prose), ui-sans-serif, system-ui, sans-serif;
   }
 
-  /* Uppercase tracked mono label — the console's structural voice. */
+  /* Uppercase mono label — operational voice. Tight tracking reads as data,
+     not branding. */
   .mono-label {
     font-size: 0.72rem;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.07em;
     text-transform: uppercase;
     font-weight: 500;
+  }
+  /* Section eyebrows earn slightly more presence. */
+  .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  /* Contextual cursors. */
+  .cursor-blink {
+    display: inline-block;
+    width: 0.55em;
+    height: 1.02em;
+    margin-left: 0.08em;
+    background: var(--accent);
+    vertical-align: -0.14em;
+    animation: tui-blink 1.05s steps(1) infinite;
+  }
+  .cursor-steady {
+    display: inline-block;
+    width: 0.55em;
+    height: 0.12em;
+    margin-left: 0.1em;
+    background: var(--accent);
+    vertical-align: 0.06em;
+  }
+
+  /* Blinking cursor only in the active (focused) prompt field. */
+  .prompt-wrap:focus-within .prompt-cursor {
+    background: var(--accent);
+    animation: tui-blink 1.05s steps(1) infinite;
+  }
+
+  /* Boot / print reveal — driven by React (opacity toggled client-side only,
+     so the SSR HTML carries no opacity:0 and stays visible without JS). */
+  .boot-line {
+    transition: opacity 200ms ease;
+  }
+
+  /* Narrow horizontal luminance pass, confined to the hero console pane. */
+  .scan-pass {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .scan-pass::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 2px;
+    background: linear-gradient(180deg, transparent, var(--accent), transparent);
+    filter: blur(1px);
+    opacity: 0;
+    animation: tui-scan 12s linear infinite;
   }
 
   /* Framed terminal pane: square border + accent corner ticks (top-left,
@@ -350,6 +412,29 @@
   }
 }
 
+/* Scan pass: crosses the hero pane in ~7s, rests ~5s. Opacity capped at 0.035. */
+@keyframes tui-scan {
+  0% {
+    top: -3%;
+    opacity: 0;
+  }
+  4% {
+    opacity: 0.035;
+  }
+  56% {
+    top: 100%;
+    opacity: 0.035;
+  }
+  60% {
+    top: 100%;
+    opacity: 0;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -366,6 +451,20 @@
   .js .reveal {
     opacity: 1;
     transform: none;
+  }
+
+  /* No scan pass, no blinking cursor under reduced motion. */
+  .scan-pass::after {
+    display: none;
+  }
+  .cursor-blink,
+  .prompt-wrap:focus-within .prompt-cursor {
+    animation: none;
+    opacity: 1;
+  }
+  .boot-line {
+    opacity: 1 !important;
+    transition: none;
   }
 
   /* Nav modal + rows: fade only, no transforms, no per-row stagger. */
