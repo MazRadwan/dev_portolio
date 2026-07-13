@@ -7,7 +7,7 @@ import { NAV_ITEMS, SITE } from "@/data/site";
 
 function Monogram() {
   return (
-    <Link href="/" className="group flex items-center gap-2.5" aria-label={`${SITE.name} — home`}>
+    <Link href="/" className="group flex items-center gap-2.5" aria-label="maz.radwan — home">
       <svg width="24" height="24" viewBox="0 0 32 32" fill="none" aria-hidden="true">
         <rect x="0.5" y="0.5" width="31" height="31" className="fill-surface-2 stroke-line" />
         <path d="M9 16 H23" strokeWidth="2" className="stroke-line-strong" />

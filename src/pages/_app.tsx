@@ -7,7 +7,7 @@ import "@/styles/globals.css";
 // Self-hosted at build time by next/font — no runtime CDN <link>.
 const hanken = Hanken_Grotesk({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500"], // 600/700 unused — fewer files, faster LCP font swap
   display: "swap",
 });
 

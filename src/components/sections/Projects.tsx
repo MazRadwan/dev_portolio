@@ -150,6 +150,13 @@ function LedgerInstrument() {
   return (
     <div className="mt-5 border-t border-line pt-5 text-[12px]">
       <table className="w-full">
+        <thead>
+          <tr className="mono-label border-b border-line text-left text-faint">
+            <th scope="col" className="py-1 pr-3 font-medium">id</th>
+            <th scope="col" className="py-1 font-medium">finding</th>
+            <th scope="col" className="py-1 text-right font-medium">state</th>
+          </tr>
+        </thead>
         <tbody>
           {SECURITY_FINDINGS.map((f) => (
             <tr key={f.id} className="border-b border-line/50 last:border-0">

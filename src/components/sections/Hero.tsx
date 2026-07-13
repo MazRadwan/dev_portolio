@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Container } from "@/components/ui/Container";
-import { Reveal } from "@/components/ui/Reveal";
 import { HeroConsole } from "./HeroConsole";
 import { SITE, PROOF_LINE } from "@/data/site";
 
@@ -103,7 +102,7 @@ export function Hero() {
       <Container>
         <div className="grid items-start gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:gap-12">
           {/* Identity — unboxed command shell; the name types on a loop */}
-          <Reveal>
+          <div>
             <div className="mono-label text-faint">$ whoami</div>
             <NameType />
 
@@ -179,12 +178,12 @@ export function Hero() {
                 </span>
               </a>
             </div>
-          </Reveal>
+          </div>
 
           {/* Telemetry / state-machine console */}
-          <Reveal className="h-full" delay={100}>
+          <div className="h-full">
             <HeroConsole />
-          </Reveal>
+          </div>
         </div>
       </Container>
     </section>
