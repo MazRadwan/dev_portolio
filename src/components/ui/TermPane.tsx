@@ -29,13 +29,3 @@ export function TermPane({
     </Tag>
   );
 }
-
-/* Live "● live"-style indicator for pane title bars. */
-export function LiveTag({ label = "live" }: { label?: string }) {
-  return (
-    <span className="mono-label flex items-center gap-2 text-accent">
-      <span className="pulse-sq" aria-hidden="true" />
-      {label}
-    </span>
-  );
-}
