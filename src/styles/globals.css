@@ -221,6 +221,92 @@
   }
 }
 
+/*
+  Progressive enhancement: reveal states apply ONLY when JS is active
+  (`.js` is added to <html> before paint by the inline script in _document).
+  With JS disabled, the static HTML is fully visible — no SSR'd opacity:0.
+*/
+@layer components {
+  .js .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 0.55s var(--ease-console),
+      transform 0.55s var(--ease-console);
+  }
+  .js .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /*
+    Mobile nav: a detached terminal pane that slides down from behind the
+    opaque bar (LyonsDen mechanics, TUI idiom). Rows print in like terminal
+    output. Only enhanced when JS is active.
+  */
+  .tui-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    background: rgba(4, 7, 13, 0.55);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 300ms ease,
+      visibility 0s linear 300ms;
+  }
+  .tui-scrim.is-open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 300ms ease;
+  }
+
+  .tui-menu {
+    position: absolute;
+    top: 100%;
+    left: 0.75rem;
+    right: 0.75rem;
+    margin-top: 0.55rem;
+    z-index: 20;
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    box-shadow: 0 20px 44px -14px rgba(0, 0, 0, 0.55);
+    transform: translateY(calc(-100% - 90px));
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 240ms ease,
+      visibility 0s linear 420ms;
+    will-change: transform;
+  }
+  .tui-menu.is-open {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    transition:
+      transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 180ms ease,
+      visibility 0s;
+  }
+
+  .tui-menu__row {
+    opacity: 0;
+    transform: translateY(-8px);
+    transition:
+      opacity 260ms ease,
+      transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .tui-menu.is-open .tui-menu__row {
+    opacity: 1;
+    transform: none;
+  }
+  .tui-menu.is-open .tui-menu__row:nth-child(1) { transition-delay: 70ms; }
+  .tui-menu.is-open .tui-menu__row:nth-child(2) { transition-delay: 105ms; }
+  .tui-menu.is-open .tui-menu__row:nth-child(3) { transition-delay: 140ms; }
+  .tui-menu.is-open .tui-menu__row:nth-child(4) { transition-delay: 175ms; }
+}
+
 @keyframes tui-blink {
   0%,
   48% {
@@ -274,5 +360,30 @@
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+
+  /* Reveals: no transform, just show. */
+  .js .reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Nav modal + rows: fade only, no transforms, no per-row stagger. */
+  .tui-menu,
+  .tui-menu.is-open {
+    transform: translateY(0);
+    transition: opacity 150ms ease, visibility 0s;
+  }
+  .tui-menu {
+    visibility: hidden;
+  }
+  .tui-menu.is-open {
+    visibility: visible;
+  }
+  .tui-menu__row,
+  .tui-menu.is-open .tui-menu__row {
+    transform: none;
+    transition: opacity 150ms ease;
+    transition-delay: 0ms !important;
   }
 }

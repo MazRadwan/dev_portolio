@@ -1,9 +1,9 @@
 // Relay visual + DOM QA gate.
 //   1. Build:  npm run build
-//   2. Serve:  PORT=4112 npm run start   (any free port)
-//   3. QA:     PORT=4112 npm run qa       (or: node qa.mjs)
+//   2. Serve:  PORT=4112 npm run start
+//   3. QA:     PORT=4112 npm run qa   (or: node qa.mjs)
 // Screenshots land in ./qa-screenshots. Exits non-zero on any failure.
-import { chromium } from "@playwright/test";
+import { chromium, webkit, devices } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -13,13 +13,9 @@ const BASE = `http://localhost:${PORT}`;
 const OUT = path.join(path.dirname(fileURLToPath(import.meta.url)), "qa-screenshots");
 fs.mkdirSync(OUT, { recursive: true });
 
-const VIEWPORTS = [
-  { name: "desktop", width: 1440, height: 900 },
-  { name: "mobile", width: 390, height: 844 },
-];
 const THEMES = ["dark", "light"];
-
 const problems = [];
+const note = (t, m) => problems.push(`[${t}] ${m}`);
 
 async function scrollThrough(page) {
   await page.evaluate(async () => {
@@ -27,37 +23,49 @@ async function scrollThrough(page) {
     const max = document.body.scrollHeight;
     for (let y = 0; y <= max; y += step) {
       window.scrollTo(0, y);
-      await new Promise((r) => setTimeout(r, 130));
+      await new Promise((r) => setTimeout(r, 120));
     }
     window.scrollTo(0, document.body.scrollHeight);
-    await new Promise((r) => setTimeout(r, 300));
+    await new Promise((r) => setTimeout(r, 250));
     window.scrollTo(0, 0);
     await new Promise((r) => setTimeout(r, 150));
   });
-  await page.waitForTimeout(700);
+  await page.waitForTimeout(600);
 }
 
-async function runAssertions(page, tag) {
-  // Privacy: no email/phone/resume links.
+// True visual visibility: rendered box with non-zero size and effective opacity.
+async function visibleInfo(page, selector) {
+  return page.evaluate((sel) => {
+    const els = Array.from(document.querySelectorAll(sel));
+    return els.map((el) => {
+      const r = el.getBoundingClientRect();
+      let op = 1;
+      for (let n = el; n; n = n.parentElement) {
+        const o = parseFloat(getComputedStyle(n).opacity);
+        if (!Number.isNaN(o)) op = Math.min(op, o);
+      }
+      const cs = getComputedStyle(el);
+      return { w: r.width, h: r.height, opacity: op, display: cs.display, visibility: cs.visibility };
+    });
+  }, selector);
+}
+
+async function assertContent(page, tag) {
   const badLinks = await page.evaluate(() =>
     Array.from(document.querySelectorAll("a[href]"))
       .map((a) => a.getAttribute("href"))
       .filter((h) => h && (h.startsWith("mailto:") || h.startsWith("tel:") || /resume/i.test(h) || /\.pdf($|\?)/i.test(h)))
   );
-  if (badLinks.length) problems.push(`[${tag}] forbidden links: ${JSON.stringify(badLinks)}`);
+  if (badLinks.length) note(tag, `forbidden links: ${JSON.stringify(badLinks)}`);
 
-  // Footer must NOT credit the stack (banned amendment) — footer-scoped, case-insensitive.
   const footerText = await page.evaluate(() => document.querySelector("footer")?.textContent || "");
-  if (/built with/i.test(footerText)) problems.push(`[${tag}] footer contains a "built with" stack credit`);
-  if (/tailwind/i.test(footerText)) problems.push(`[${tag}] footer name-drops Tailwind`);
-  if (/next\.?js/i.test(footerText)) problems.push(`[${tag}] footer name-drops Next.js`);
+  if (/built with/i.test(footerText)) note(tag, `footer has a "built with" stack credit`);
+  if (/tailwind/i.test(footerText)) note(tag, `footer name-drops Tailwind`);
+  if (/next\.?js/i.test(footerText)) note(tag, `footer name-drops Next.js`);
 
-  // textContent covers all DOM text regardless of scroll-reveal opacity state.
   const bodyText = await page.evaluate(() => document.body.textContent || "");
-  if (/built with/i.test(bodyText)) problems.push(`[${tag}] page contains a "built with" credit`);
-
-  // AWS amendment: chip + three certs, all present and in order.
-  if (!/\bAWS\b/.test(bodyText)) problems.push(`[${tag}] AWS not present`);
+  if (/built with/i.test(bodyText)) note(tag, `page has a "built with" credit`);
+  if (!/\bAWS\b/.test(bodyText)) note(tag, `AWS not present`);
   const certs = [
     "AWS Solutions Architect",
     "AWS Developer Associate",
@@ -68,88 +76,140 @@ async function runAssertions(page, tag) {
   ];
   let last = -1;
   for (const c of certs) {
-    const idx = bodyText.indexOf(c);
-    if (idx === -1) problems.push(`[${tag}] missing cert: ${c}`);
-    else if (idx < last) problems.push(`[${tag}] cert out of order: ${c}`);
-    last = idx;
+    const i = bodyText.indexOf(c);
+    if (i === -1) note(tag, `missing cert: ${c}`);
+    else if (i < last) note(tag, `cert out of order: ${c}`);
+    last = i;
   }
 
-  // Five project cards, each with a heading.
   const headings = await page.$$eval("#projects article h3", (els) =>
     els.map((e) => e.textContent?.trim()).filter(Boolean)
   );
-  if (headings.length !== 5) problems.push(`[${tag}] expected 5 project headings, found ${headings.length}`);
+  if (headings.length !== 5) note(tag, `expected 5 project headings, found ${headings.length}`);
 
   for (const id of ["hero", "about", "projects", "contact"]) {
-    if (!(await page.$(`#${id}`))) problems.push(`[${tag}] missing section #${id}`);
+    if (!(await page.$(`#${id}`))) note(tag, `missing section #${id}`);
   }
 
   const formOk = await page.evaluate(() => {
     const f = document.querySelector('form[name="contact"]');
-    return !!(
-      f &&
-      f.getAttribute("data-netlify") === "true" &&
-      f.querySelector('input[name="bot-field"]') &&
-      f.querySelector('input[name="form-name"]')
-    );
+    return !!(f && f.getAttribute("data-netlify") === "true" &&
+      f.querySelector('input[name="bot-field"]') && f.querySelector('input[name="form-name"]'));
   });
-  if (!formOk) problems.push(`[${tag}] contact form missing Netlify wiring`);
+  if (!formOk) note(tag, `contact form missing Netlify wiring`);
+
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  if (overflow > 1) note(tag, `horizontal overflow: ${overflow}px`);
 }
 
-for (const theme of THEMES) {
-  for (const vp of VIEWPORTS) {
-    const browser = await chromium.launch();
-    const context = await browser.newContext({
-      viewport: { width: vp.width, height: vp.height },
-      deviceScaleFactor: 2,
-    });
-    if (theme === "light") {
-      await context.addInitScript(() => {
-        try { localStorage.setItem("theme", "light"); } catch (e) {}
-      });
-    }
-    const page = await context.newPage();
-    const tag = `${theme}-${vp.name}`;
+// Content must be visible with NO JavaScript (no SSR'd hidden reveal states).
+async function assertNoJs(engine, tag) {
+  const browser = await engine.launch();
+  const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 1440, height: 900 } });
+  const page = await ctx.newPage();
+  await page.goto(BASE, { waitUntil: "load" });
+  const h1 = (await visibleInfo(page, "h1"))[0];
+  if (!h1 || h1.opacity < 0.99 || h1.w < 1 || h1.h < 1) note(tag, `h1 not visible without JS: ${JSON.stringify(h1)}`);
+  const cards = await visibleInfo(page, "#projects article h3");
+  if (cards.length !== 5) note(tag, `expected 5 cards without JS, got ${cards.length}`);
+  cards.forEach((c, i) => {
+    if (c.opacity < 0.99 || c.w < 1 || c.h < 1) note(tag, `card ${i + 1} not visible without JS: ${JSON.stringify(c)}`);
+  });
+  await browser.close();
+}
 
-    page.on("console", (msg) => {
-      if (msg.type() === "error") problems.push(`[${tag}] console.error: ${msg.text()}`);
-    });
-    page.on("pageerror", (err) => problems.push(`[${tag}] pageerror: ${err.message}`));
-    page.on("requestfailed", (req) => {
-      if (req.url().includes("favicon.ico")) return;
-      problems.push(`[${tag}] requestfailed: ${req.url()} ${req.failure()?.errorText || ""}`);
-    });
-    page.on("response", (res) => {
-      if (res.status() >= 400 && res.url().startsWith(BASE)) problems.push(`[${tag}] http ${res.status()}: ${res.url()}`);
-    });
+// Mobile nav modal: opens (visible + aria-expanded), closes on Escape.
+async function assertNavModal(engine, tag, screenshot) {
+  const browser = await engine.launch();
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const page = await ctx.newPage();
+  await page.goto(BASE, { waitUntil: "networkidle" });
+  const btn = page.locator('[aria-controls="mobile-menu"]');
+  await btn.click();
+  await page.waitForTimeout(600); // let the drop + stagger settle
 
-    await page.goto(BASE, { waitUntil: "networkidle" });
-    await page.waitForTimeout(400);
+  const expanded = await btn.getAttribute("aria-expanded");
+  if (expanded !== "true") note(tag, `aria-expanded not true after open (${expanded})`);
+  const menu = (await visibleInfo(page, "#mobile-menu"))[0];
+  if (!menu || menu.opacity < 0.99 || menu.visibility !== "visible") note(tag, `menu not visible after open: ${JSON.stringify(menu)}`);
+  const rows = await visibleInfo(page, "#mobile-menu .tui-menu__row");
+  if (rows.length < 3) note(tag, `expected >=3 menu rows, got ${rows.length}`);
+  rows.forEach((r, i) => {
+    if (r.opacity < 0.99) note(tag, `menu row ${i + 1} not visible after open (opacity ${r.opacity})`);
+  });
+  if (screenshot) await page.screenshot({ path: path.join(OUT, `${tag}-navopen.png`) });
 
-    const isDark = await page.evaluate(() => document.documentElement.classList.contains("dark"));
-    if ((theme === "dark") !== isDark) problems.push(`[${tag}] theme class mismatch (isDark=${isDark})`);
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(600);
+  const expanded2 = await btn.getAttribute("aria-expanded");
+  if (expanded2 !== "false") note(tag, `aria-expanded not false after Escape (${expanded2})`);
+  const menu2 = (await visibleInfo(page, "#mobile-menu"))[0];
+  if (menu2 && menu2.visibility !== "hidden" && menu2.opacity > 0.01) note(tag, `menu still visible after Escape: ${JSON.stringify(menu2)}`);
 
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-    if (overflow > 1) problems.push(`[${tag}] horizontal overflow: ${overflow}px`);
+  await browser.close();
+}
 
-    await page.screenshot({ path: path.join(OUT, `${tag}-hero.png`) });
-    await scrollThrough(page);
+async function runViewport(engine, contextOpts, theme, tag, { screenshots }) {
+  const browser = await engine.launch();
+  const opts = { ...contextOpts, colorScheme: theme === "dark" ? "dark" : "light" };
+  const ctx = await browser.newContext(opts);
+  if (theme === "light") {
+    await ctx.addInitScript(() => { try { localStorage.setItem("theme", "light"); } catch (e) {} });
+  }
+  const page = await ctx.newPage();
+  page.on("console", (m) => { if (m.type() === "error") note(tag, `console.error: ${m.text()}`); });
+  page.on("pageerror", (e) => note(tag, `pageerror: ${e.message}`));
+  page.on("requestfailed", (r) => { if (!r.url().includes("favicon.ico")) note(tag, `requestfailed: ${r.url()}`); });
+  page.on("response", (r) => { if (r.status() >= 400 && r.url().startsWith(BASE)) note(tag, `http ${r.status()}: ${r.url()}`); });
+
+  await page.goto(BASE, { waitUntil: "networkidle" });
+  await page.waitForTimeout(300);
+
+  const isDark = await page.evaluate(() => document.documentElement.classList.contains("dark"));
+  if ((theme === "dark") !== isDark) note(tag, `theme class mismatch (isDark=${isDark})`);
+
+  if (screenshots) await page.screenshot({ path: path.join(OUT, `${tag}-hero.png`) });
+  await scrollThrough(page);
+  if (screenshots) {
     await page.screenshot({ path: path.join(OUT, `${tag}-full.png`), fullPage: true });
-
     await page.addStyleTag({ content: "header{display:none!important}" });
     await page.waitForTimeout(120);
     await page.locator("#about").screenshot({ path: path.join(OUT, `${tag}-about.png`) });
     await page.locator("footer").screenshot({ path: path.join(OUT, `${tag}-footer.png`) });
-
-    await runAssertions(page, tag);
-    await browser.close();
-    console.log(`captured ${tag}`);
   }
+
+  await assertContent(page, tag);
+  await browser.close();
 }
+
+// ---- run matrix ----
+const desktop = { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 };
+const mobile = { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 };
+const iphone = devices["iPhone 15"];
+
+for (const theme of THEMES) {
+  // Chromium — full assertions + screenshots.
+  await runViewport(chromium, desktop, theme, `${theme}-desktop`, { screenshots: true });
+  await runViewport(chromium, mobile, theme, `${theme}-mobile`, { screenshots: true });
+  // WebKit (Safari) — desktop + iOS device profile, assertions only.
+  await runViewport(webkit, desktop, theme, `${theme}-webkit-desktop`, { screenshots: false });
+  await runViewport(webkit, { ...iphone }, theme, `${theme}-webkit-ios`, { screenshots: false });
+  console.log(`matrix done: ${theme}`);
+}
+
+// Mobile nav modal (chromium + webkit-iOS).
+await assertNavModal(chromium, "chromium-navmodal", true);
+await assertNavModal(webkit, "webkit-navmodal", false);
+console.log("nav modal checks done");
+
+// No-JS progressive-enhancement smoke (chromium + webkit).
+await assertNoJs(chromium, "chromium-nojs");
+await assertNoJs(webkit, "webkit-nojs");
+console.log("no-js checks done");
 
 console.log("\n=== QA RESULT ===");
 if (problems.length === 0) {
-  console.log("PASS — no console errors, no 404s, no forbidden links, no footer stack credit, AWS certs present and ordered, 5 project cards.");
+  console.log("PASS — chromium+webkit(+iOS), no-JS content visible, nav modal opens/closes, no stack credit, AWS certs ordered, 5 cards, no overflow, zero console errors.");
 } else {
   console.log(`FAIL — ${problems.length} problem(s):`);
   for (const p of problems) console.log(" - " + p);

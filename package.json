@@ -10,7 +10,6 @@
     "qa": "node qa.mjs"
   },
   "dependencies": {
-    "framer-motion": "^12.42.2",
     "lucide-react": "^0.454.0",
     "next": "^16.2.10",
     "react": "^19.2.7",

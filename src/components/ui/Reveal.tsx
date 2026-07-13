@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef } from "react";
 
 interface RevealProps {
   children: React.ReactNode;
@@ -6,18 +6,40 @@ interface RevealProps {
   delay?: number;
 }
 
+/*
+  Scroll reveal that is progressive-enhancement safe: the hidden state lives
+  behind `.js .reveal` (see globals.css), so the server-rendered HTML has no
+  opacity:0 and stays fully visible if JavaScript never runs. Once hydrated,
+  an IntersectionObserver adds `is-visible` to play the reveal.
+*/
 export function Reveal({ children, className = "", delay = 0 }: RevealProps) {
-  const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (el.classList.contains("is-visible")) return;
+
+    const io = new IntersectionObserver(
+      ([entry], obs) => {
+        if (entry.isIntersecting) {
+          el.classList.add("is-visible");
+          obs.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -80px 0px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   return (
-    <motion.div
-      className={className}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.55, delay, ease: [0.22, 0.61, 0.36, 1] }}
+    <div
+      ref={ref}
+      className={`reveal ${className}`}
+      style={delay ? { transitionDelay: `${delay}ms` } : undefined}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

@@ -6,10 +6,12 @@ export default function Document() {
       <Head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <meta name="theme-color" content="#0a0e17" />
-        {/* Set the theme class before paint to avoid a flash. Dark is default. */}
+        {/* Before paint: mark JS active (gates reveal states so no-JS HTML stays
+            fully visible) and set the theme class to avoid a flash. Dark default. */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
+              document.documentElement.classList.add('js');
               try {
                 if (localStorage.getItem('theme') === 'light') {
                   document.documentElement.classList.remove('dark');

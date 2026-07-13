@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -23,62 +23,93 @@ function Monogram() {
 export function Navigation({ isScrolled }: { isScrolled: boolean }) {
   const [open, setOpen] = useState(false);
 
+  // Body scroll lock + Escape to close while the menu is open.
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  const barBg = open
+    ? "bg-bg border-line"
+    : isScrolled
+      ? "bg-bg/85 backdrop-blur-md border-line"
+      : "border-transparent";
+
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-        isScrolled || open ? "border-b border-line bg-bg/85 backdrop-blur-md" : "border-b border-transparent"
-      }`}
-    >
-      <Container>
-        <nav className="flex h-14 items-center justify-between">
-          <Monogram />
+    <header className="fixed inset-x-0 top-0 z-50">
+      {/* Opaque bar (z-30) — the tucked menu hides behind it. */}
+      <div className={`relative z-30 border-b transition-colors duration-300 ${barBg}`}>
+        <Container>
+          <nav className="flex h-14 items-center justify-between">
+            <Monogram />
 
-          <div className="hidden items-center gap-1 md:flex">
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                className="mono-label px-2.5 py-2 text-muted transition-colors hover:text-ink"
-              >
-                <span className="text-faint">~/</span>
-                {item.label}
-              </Link>
-            ))}
-            <span className="mx-2 h-4 w-px bg-line" aria-hidden="true" />
-            <ThemeToggle />
-          </div>
-
-          <div className="flex items-center gap-2 md:hidden">
-            <ThemeToggle />
-            <button
-              onClick={() => setOpen((v) => !v)}
-              className="inline-flex h-8 w-8 items-center justify-center border border-line bg-surface-2 text-muted"
-              aria-label={open ? "Close menu" : "Open menu"}
-              aria-expanded={open}
-            >
-              {open ? <X size={16} /> : <Menu size={16} />}
-            </button>
-          </div>
-        </nav>
-
-        {open && (
-          <div className="pb-3 md:hidden">
-            <div className="flex flex-col gap-0.5 border-t border-line pt-2">
+            <div className="hidden items-center gap-1 md:flex">
               {NAV_ITEMS.map((item) => (
                 <Link
                   key={item.label}
                   href={item.href}
-                  onClick={() => setOpen(false)}
-                  className="mono-label px-2 py-2.5 text-muted transition-colors hover:bg-surface-2 hover:text-ink"
+                  className="mono-label px-2.5 py-2 text-muted transition-colors hover:text-ink"
                 >
                   <span className="text-faint">~/</span>
                   {item.label}
                 </Link>
               ))}
+              <span className="mx-2 h-4 w-px bg-line" aria-hidden="true" />
+              <ThemeToggle />
             </div>
+
+            <div className="flex items-center gap-2 md:hidden">
+              <ThemeToggle />
+              <button
+                onClick={() => setOpen((v) => !v)}
+                className="inline-flex h-8 w-8 items-center justify-center border border-line bg-surface-2 text-muted transition-colors hover:text-ink"
+                aria-label={open ? "Close menu" : "Open menu"}
+                aria-expanded={open}
+                aria-controls="mobile-menu"
+              >
+                {open ? <X size={16} /> : <Menu size={16} />}
+              </button>
+            </div>
+          </nav>
+        </Container>
+      </div>
+
+      {/* Detached terminal-pane menu + scrim (mobile only). */}
+      <div className="md:hidden">
+        <div
+          className={`tui-scrim ${open ? "is-open" : ""}`}
+          onClick={() => setOpen(false)}
+          aria-hidden="true"
+        />
+        <div id="mobile-menu" className={`tui-menu ${open ? "is-open" : ""}`}>
+          <div className="flex items-center justify-between border-b border-line px-3.5 py-2.5">
+            <span className="mono-label text-faint">~/navigate</span>
+            <span className="mono-label text-accent">menu</span>
           </div>
-        )}
-      </Container>
+          {NAV_ITEMS.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              onClick={() => setOpen(false)}
+              tabIndex={open ? 0 : -1}
+              className="tui-menu__row mono-label flex items-center border-b border-line px-4 py-3.5 text-muted transition-colors last:border-b-0 hover:bg-surface-2 hover:text-ink"
+            >
+              <span className="text-faint">~/</span>
+              {item.label}
+              <span className="ml-auto text-faint">›</span>
+            </Link>
+          ))}
+        </div>
+      </div>
     </header>
   );
 }
