@@ -4,22 +4,91 @@ import { Reveal } from "@/components/ui/Reveal";
 import { HeroConsole } from "./HeroConsole";
 import { SITE, PROOF_LINE } from "@/data/site";
 
-/* Name cursor: blinks during the ~1.5s boot, settles to a steady underscore,
-   then disappears. Decorative and JS-only — nothing renders without JS. */
-function NameCursor() {
-  const [phase, setPhase] = useState<"none" | "blink" | "steady">("none");
+const FULL_NAME = "Maz Radwan";
+
+/*
+  Looping type-out of the identity. Progressive enhancement: the full name is
+  real text in the SSR HTML (an invisible in-flow sizer reserves the box, and
+  the visible span starts at the full name), so no-JS / first paint / SEO all
+  get the complete name. The loop runs only after hydration and pauses when the
+  tab is hidden. The h1's accessible name is fixed via aria-label, so a screen
+  reader never hears a partial name. Reduced motion = static full name, no cursor.
+*/
+function NameType() {
+  const [text, setText] = useState(FULL_NAME);
+  const [active, setActive] = useState(false);
+  const [holding, setHolding] = useState(false);
+
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    setPhase("blink");
-    const t1 = setTimeout(() => setPhase("steady"), 1500);
-    const t2 = setTimeout(() => setPhase("none"), 2100);
+    setActive(true);
+    setHolding(true);
+
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout>;
+    let i = FULL_NAME.length;
+    let mode: "backspace" | "type" | "hold" = "backspace";
+    const rand = (a: number, b: number) => Math.round(a + Math.random() * (b - a));
+    const schedule = (ms: number) => {
+      timer = setTimeout(step, ms);
+    };
+
+    function step() {
+      if (cancelled) return;
+      if (document.hidden) {
+        schedule(500); // paused while the tab is hidden
+        return;
+      }
+      if (mode === "backspace") {
+        if (i > 0) {
+          i -= 1;
+          setText(FULL_NAME.slice(0, i));
+          schedule(rand(30, 42));
+        } else {
+          mode = "type";
+          schedule(280);
+        }
+      } else if (mode === "type") {
+        if (i < FULL_NAME.length) {
+          i += 1;
+          setText(FULL_NAME.slice(0, i));
+          setHolding(false);
+          schedule(rand(55, 85));
+        } else {
+          mode = "hold";
+          setHolding(true);
+          schedule(6500);
+        }
+      } else {
+        mode = "backspace";
+        setHolding(false);
+        schedule(0);
+      }
+    }
+
+    // Boot choreography: the name sits full for ~1.9s, then the loop begins.
+    schedule(1900);
     return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
+      cancelled = true;
+      clearTimeout(timer);
     };
   }, []);
-  if (phase === "none") return null;
-  return <span aria-hidden="true" className={phase === "blink" ? "cursor-blink" : "cursor-steady"} />;
+
+  return (
+    <h1
+      aria-label={FULL_NAME}
+      className="relative mt-3 font-semibold leading-[0.98] tracking-tight text-ink [font-size:clamp(3.25rem,7vw,6.5rem)]"
+    >
+      {/* in-flow sizer reserves the full box so typing never reflows the page */}
+      <span aria-hidden="true" className="invisible">
+        {FULL_NAME}
+      </span>
+      <span aria-hidden="true" className="absolute inset-0">
+        {text}
+        {active && <span className={holding ? "cursor-blink" : "cursor-solid"} />}
+      </span>
+    </h1>
+  );
 }
 
 export function Hero() {
@@ -33,22 +102,20 @@ export function Hero() {
 
       <Container>
         <div className="grid items-start gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:gap-12">
-          {/* Identity — unboxed command shell; the name breaks the terminal scale */}
+          {/* Identity — unboxed command shell; the name types on a loop */}
           <Reveal>
             <div className="mono-label text-faint">$ whoami</div>
-            <h1 className="mt-3 font-semibold leading-[0.98] tracking-tight text-ink [font-size:clamp(3.25rem,7vw,6.5rem)]">
-              Maz Radwan
-              <NameCursor />
-            </h1>
+            <NameType />
 
-            <p className="mt-5 text-sm text-muted sm:text-[15px]">
-              senior programmer / analyst
-              <span className="text-faint-glyph"> :: </span>
-              <span className="text-accent">ai-integrated enterprise systems</span>
+            <p className="prose-face mt-6 max-w-xl text-[1.05rem] font-medium leading-snug text-ink sm:text-[1.18rem]">
+              {SITE.heroThesis}
+            </p>
+            <p className="prose-face mt-3 max-w-xl text-[14px] leading-relaxed text-muted">
+              {SITE.heroSupport}
             </p>
 
-            {/* immediate proof, directly under the title */}
-            <ul className="mono-label mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-muted">
+            {/* immediate proof line */}
+            <ul className="mono-label mt-5 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-muted">
               {PROOF_LINE.map((item, i) => (
                 <li key={item} className="flex items-center gap-2.5">
                   {i > 0 && (
@@ -60,10 +127,6 @@ export function Hero() {
                 </li>
               ))}
             </ul>
-
-            <p className="prose-face mt-6 max-w-lg text-[15px] leading-relaxed text-muted">
-              {SITE.heroBio}
-            </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <a

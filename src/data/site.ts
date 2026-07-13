@@ -3,9 +3,11 @@ export const SITE = {
   role: "Senior Programmer / Analyst",
   focus: "AI-Integrated Enterprise Systems",
   location: "Newfoundland & Labrador, Canada",
-  // Two lines — proof up front; agentic-methodology detail lives in the About inspection.
-  heroBio:
-    "I build AI-integrated enterprise systems for provincial healthcare — compliance, incident classification, and identity management. Backend and systems integration, mostly .NET.",
+  // Approved hero thesis + supporting line (2026-07-13). Fuller methodology
+  // detail lives in the About inspection / evidence log.
+  heroThesis: "I engineer regulated healthcare systems with disciplined AI-agent orchestration.",
+  heroSupport:
+    "Senior Programmer/Analyst working across .NET compliance, clinical safety, identity, and enterprise integration — using custom stateful agent harnesses, independent cross-model review, and deterministic quality gates.",
   social: {
     github: "https://github.com/MazRadwan",
     linkedin: "https://linkedin.com/in/maz-radwan",
