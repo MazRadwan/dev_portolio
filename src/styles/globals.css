@@ -318,7 +318,7 @@
   .tui-scrim {
     position: fixed;
     inset: 0;
-    z-index: 10;
+    z-index: 30;
     background: rgba(4, 7, 13, 0.55);
     opacity: 0;
     visibility: hidden;
@@ -333,12 +333,11 @@
   }
 
   .tui-menu {
-    position: absolute;
-    top: 100%;
+    position: fixed;
+    top: calc(3.5rem + 0.5rem); /* below the h-14 bar + gap */
     left: 0.75rem;
     right: 0.75rem;
-    margin-top: 0.55rem;
-    z-index: 20;
+    z-index: 40; /* tucks behind the header (z-50), above the scrim (z-30) */
     background: var(--surface);
     border: 1px solid var(--line-strong);
     box-shadow: 0 20px 44px -14px rgba(0, 0, 0, 0.55);

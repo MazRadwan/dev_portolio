@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -20,8 +20,89 @@ function Monogram() {
   );
 }
 
-export function Navigation({ isScrolled }: { isScrolled: boolean }) {
+export function Navigation() {
+  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  const lastScrollY = useRef(0);
+  const offsetRef = useRef(0);
+  const ticking = useRef(false);
+
+  /*
+    Smart-sticky header — DYNAMIC 1:1 tracking (iOS-Safari-toolbar style, ported
+    from LyonsDen Header.island). The header slides out/in pixel-for-pixel with
+    the scroll delta (survives momentum scrolling, unlike a binary hide toggle);
+    on pause it settles to the nearer edge. The transform is written straight to
+    the DOM node, rAF-throttled — no React re-render per frame. Mobile only; the
+    desktop header stays pinned.
+  */
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isMobile = () => window.matchMedia("(max-width: 767px)").matches;
+    const SHOW_AT_TOP = 80;
+    const SETTLE = "transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)";
+    let settleTimer: ReturnType<typeof setTimeout>;
+    lastScrollY.current = Math.max(window.scrollY, 0);
+
+    const apply = (animated: boolean) => {
+      el.style.transition = animated && !reduced ? SETTLE : "none";
+      el.style.transform = `translateY(${-offsetRef.current}px)`;
+    };
+
+    // Menu just opened (effect re-runs on `open`): snap fully visible + pin.
+    if (open && offsetRef.current > 0) {
+      offsetRef.current = 0;
+      apply(true);
+    }
+
+    const update = () => {
+      const y = Math.max(window.scrollY, 0); // guard iOS rubber-band overscroll
+      const delta = y - lastScrollY.current;
+      lastScrollY.current = y;
+      setScrolled(y > 24);
+
+      if (!isMobile()) {
+        offsetRef.current = 0;
+        apply(false);
+      } else if (y < SHOW_AT_TOP || open) {
+        offsetRef.current = 0;
+        apply(true);
+      } else {
+        const h = el.offsetHeight;
+        offsetRef.current = Math.min(Math.max(offsetRef.current + delta, 0), h);
+        apply(false);
+        clearTimeout(settleTimer);
+        settleTimer = setTimeout(() => {
+          offsetRef.current = offsetRef.current > h / 2 ? h : 0;
+          apply(true);
+        }, 150);
+      }
+      ticking.current = false;
+    };
+
+    const onScroll = () => {
+      if (!ticking.current) {
+        ticking.current = true;
+        window.requestAnimationFrame(update);
+      }
+    };
+    const onResize = () => {
+      offsetRef.current = 0;
+      apply(true); // snap back on rotate/resize (desktop stays pinned anyway)
+    };
+
+    setScrolled(Math.max(window.scrollY, 0) > 24);
+    if (!isMobile()) apply(false);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+      clearTimeout(settleTimer);
+    };
+  }, [open]);
 
   // Body scroll lock + Escape to close while the menu is open.
   useEffect(() => {
@@ -40,14 +121,17 @@ export function Navigation({ isScrolled }: { isScrolled: boolean }) {
 
   const barBg = open
     ? "bg-bg border-line"
-    : isScrolled
+    : scrolled
       ? "bg-bg/85 backdrop-blur-md border-line"
       : "border-transparent";
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50">
-      {/* Opaque bar (z-30) — the tucked menu hides behind it. */}
-      <div className={`relative z-30 border-b transition-colors duration-300 ${barBg}`}>
+    <>
+      {/* Header (z-50) transforms; the tucked menu (z-40) hides behind it. */}
+      <header
+        ref={headerRef}
+        className={`fixed inset-x-0 top-0 z-50 border-b [will-change:transform] ${barBg}`}
+      >
         <Container>
           <nav className="flex h-14 items-center justify-between">
             <Monogram />
@@ -59,7 +143,7 @@ export function Navigation({ isScrolled }: { isScrolled: boolean }) {
                   href={item.href}
                   className="mono-label px-2.5 py-2 text-muted transition-colors hover:text-ink"
                 >
-                  <span className="text-faint">~/</span>
+                  <span className="text-faint-glyph">~/</span>
                   {item.label}
                 </Link>
               ))}
@@ -81,9 +165,10 @@ export function Navigation({ isScrolled }: { isScrolled: boolean }) {
             </div>
           </nav>
         </Container>
-      </div>
+      </header>
 
-      {/* Detached terminal-pane menu + scrim (mobile only). */}
+      {/* Scrim + detached menu — siblings of the header so its transform never
+          becomes the containing block for these fixed elements. */}
       <div className="md:hidden">
         <div
           className={`tui-scrim ${open ? "is-open" : ""}`}
@@ -103,13 +188,13 @@ export function Navigation({ isScrolled }: { isScrolled: boolean }) {
               tabIndex={open ? 0 : -1}
               className="tui-menu__row mono-label flex items-center border-b border-line px-4 py-3.5 text-muted transition-colors last:border-b-0 hover:bg-surface-2 hover:text-ink"
             >
-              <span className="text-faint">~/</span>
+              <span className="text-faint-glyph">~/</span>
               {item.label}
-              <span className="ml-auto text-faint">›</span>
+              <span className="ml-auto text-faint-glyph">›</span>
             </Link>
           ))}
         </div>
       </div>
-    </header>
+    </>
   );
 }
