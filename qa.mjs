@@ -165,6 +165,60 @@ async function assertNavModal(engine, tag, screenshot) {
   await browser.close();
 }
 
+// Smart-sticky header regression — MUST stay in the default matrix so a future
+// round that breaks or drops the header fails the gate. Mobile only.
+async function assertSmartSticky(engine, contextOpts, tag) {
+  const browser = await engine.launch();
+  const ctx = await browser.newContext({ ...contextOpts });
+  const page = await ctx.newPage();
+  await page.goto(BASE, { waitUntil: "networkidle" });
+  await page.waitForTimeout(300);
+
+  const h = await page.$eval("header", (el) => el.offsetHeight);
+  const ty = () =>
+    page.$eval("header", (el) => {
+      const t = getComputedStyle(el).transform;
+      return !t || t === "none" ? 0 : new DOMMatrix(t).m42; // translateY
+    });
+  const settleAt = async (y) => {
+    await page.evaluate((yy) => window.scrollTo(0, yy), y);
+    await page.waitForTimeout(700); // 150ms settle debounce + 250ms tween + buffer
+  };
+
+  // (c) near the top → fully visible
+  await settleAt(0);
+  let t = await ty();
+  if (Math.abs(t) > 1) note(tag, `sticky: header not visible near top (ty=${t})`);
+
+  // (a) scroll down well past 200px + pause → settled hidden
+  await settleAt(600);
+  t = await ty();
+  if (t > -(h - 1)) note(tag, `sticky: header not settled hidden after scroll-down (ty=${t}, h=${h})`);
+
+  // (b) scroll up + pause → settled visible
+  await settleAt(400);
+  t = await ty();
+  if (Math.abs(t) > 1) note(tag, `sticky: header not settled visible after scroll-up (ty=${t})`);
+
+  // (d) menu open mid-page → header pinned visible (and stays pinned)
+  await settleAt(600);
+  await settleAt(420); // scroll up so the header is visible + tappable, still mid-page
+  const preOpen = await ty();
+  if (Math.abs(preOpen) > 1) note(tag, `sticky: header not visible before opening menu (ty=${preOpen})`);
+  await page.locator('[aria-controls="mobile-menu"]').click();
+  await page.waitForTimeout(450);
+  t = await ty();
+  if (Math.abs(t) > 1) note(tag, `sticky: header not pinned when menu open (ty=${t})`);
+  await page.evaluate(() => window.scrollTo(0, 900)); // try to scroll while open
+  await page.waitForTimeout(450);
+  t = await ty();
+  if (Math.abs(t) > 1) note(tag, `sticky: header not pinned while scrolling with menu open (ty=${t})`);
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(300);
+
+  await browser.close();
+}
+
 async function runViewport(engine, contextOpts, theme, tag, { screenshots }) {
   const browser = await engine.launch();
   const opts = { ...contextOpts, colorScheme: theme === "dark" ? "dark" : "light" };
@@ -220,6 +274,11 @@ await assertNavModal(chromium, "chromium-navmodal", true);
 await assertNavModal(webkit, "webkit-navmodal", false);
 console.log("nav modal checks done");
 
+// Smart-sticky header regression (chromium mobile + webkit iPhone 15).
+await assertSmartSticky(chromium, { viewport: { width: 390, height: 844 } }, "chromium-sticky");
+await assertSmartSticky(webkit, { ...iphone }, "webkit-sticky");
+console.log("smart-sticky checks done");
+
 // No-JS progressive-enhancement smoke (chromium + webkit).
 await assertNoJs(chromium, "chromium-nojs");
 await assertNoJs(webkit, "webkit-nojs");
@@ -227,7 +286,7 @@ console.log("no-js checks done");
 
 console.log("\n=== QA RESULT ===");
 if (problems.length === 0) {
-  console.log("PASS — chromium+webkit(+iOS), no-JS content visible, nav modal opens/closes, no stack credit, AWS certs ordered, 5 cards, no overflow, zero console errors.");
+  console.log("PASS — chromium+webkit(+iOS), no-JS content visible, nav modal opens/closes, smart-sticky header settles/pins, no stack credit, AWS certs ordered, 5 cards, no overflow, zero console errors.");
 } else {
   console.log(`FAIL — ${problems.length} problem(s):`);
   for (const p of problems) console.log(" - " + p);
