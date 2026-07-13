@@ -66,21 +66,26 @@ async function assertContent(page, tag) {
   const bodyText = await page.evaluate(() => document.body.textContent || "");
   if (/built with/i.test(bodyText)) note(tag, `page has a "built with" credit`);
   if (!/\bAWS\b/.test(bodyText)) note(tag, `AWS not present`);
-  const certs = [
+  // Certs live in an audit table (credential / issuer / year / state cells).
+  const expectedCerts = [
     "AWS Solutions Architect",
     "AWS Developer Associate",
     "AWS Cloud Practitioner",
-    "AI for Cybersecurity (techNL, 2026)",
+    "AI for Cybersecurity",
     "ISTQB Certified Tester (QA/QC)",
     "EC-Council Cyber-Security Technician",
   ];
-  let last = -1;
-  for (const c of certs) {
-    const i = bodyText.indexOf(c);
-    if (i === -1) note(tag, `missing cert: ${c}`);
-    else if (i < last) note(tag, `cert out of order: ${c}`);
-    last = i;
-  }
+  const certRows = await page.$$eval('[data-testid="certs-table"] tbody tr td:first-child', (els) =>
+    els.map((e) => (e.textContent || "").trim())
+  );
+  if (certRows.length !== expectedCerts.length)
+    note(tag, `expected ${expectedCerts.length} cert rows, found ${certRows.length}`);
+  expectedCerts.forEach((c, i) => {
+    if (certRows[i] !== c) note(tag, `cert row ${i} = "${certRows[i] ?? "∅"}", expected "${c}"`);
+  });
+  const certTableText = await page.$eval('[data-testid="certs-table"]', (t) => t.textContent || "").catch(() => "");
+  if (!certTableText.includes("techNL")) note(tag, `certs table missing issuer techNL`);
+  if (!certTableText.includes("2026")) note(tag, `certs table missing year 2026`);
 
   const headings = await page.$$eval("#projects article h3", (els) =>
     els.map((e) => e.textContent?.trim()).filter(Boolean)
@@ -163,7 +168,8 @@ async function runViewport(engine, contextOpts, theme, tag, { screenshots }) {
   page.on("response", (r) => { if (r.status() >= 400 && r.url().startsWith(BASE)) note(tag, `http ${r.status()}: ${r.url()}`); });
 
   await page.goto(BASE, { waitUntil: "networkidle" });
-  await page.waitForTimeout(300);
+  // Let the hero boot sequence settle into its resolved state before shooting.
+  await page.waitForTimeout(screenshots ? 2100 : 400);
 
   const isDark = await page.evaluate(() => document.documentElement.classList.contains("dark"));
   if ((theme === "dark") !== isDark) note(tag, `theme class mismatch (isDark=${isDark})`);
