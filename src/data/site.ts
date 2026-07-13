@@ -18,7 +18,7 @@ export const SITE = {
 } as const;
 
 // Immediate proof, shown directly under the hero title.
-export const PROOF_LINE = ["PROVINCIAL HEALTHCARE", "IAM", "12 VULNS VERIFIED", "3 AWS CERTS"] as const;
+export const PROOF_LINE = ["PROVINCIAL HEALTHCARE", "IAM", "12 LAB VULNS FIXED", "3 AWS CERTS"] as const;
 
 export const NAV_ITEMS = [
   { label: "About", href: "#about" },
@@ -32,7 +32,7 @@ export const READOUT = [
   { key: "domain", value: "Provincial healthcare · enterprise .NET" },
   { key: "focus", value: "Backend · systems integration · IAM" },
   { key: "practice", value: "Agentic · Claude Code · Codex" },
-  { key: "security", value: "AI for Cybersecurity · 12 vulns verified" },
+  { key: "security", value: "AI for Cybersecurity · 12 lab vulns fixed" },
 ] as const;
 
 // IAM lifecycle state machine.
@@ -49,7 +49,7 @@ export const SUBSYSTEMS = [
 // Cycling proof channel — a highlighted row moves down the ledger; values stay visible.
 export const PROOF_CHANNEL = [
   { key: "CASE_FILES", value: "05" },
-  { key: "VULNS_FIXED", value: "12" },
+  { key: "LAB_VULNS_FIXED", value: "12" },
   { key: "AWS_CERTS", value: "03" },
   { key: "DEPLOY_MODE", value: "CLOUD | ON_PREM" },
 ] as const;
@@ -59,7 +59,7 @@ export const EVIDENCE_LOG = [
   { t: "09:14:03", tag: "ROLE", text: "provincial healthcare / senior programmer / analyst" },
   { t: "09:14:04", tag: "IAM", text: "joiner-mover-leaver / Graph / AD / LDAP / dedup" },
   { t: "09:14:04", tag: "AGENTS", text: "Claude implements / Codex gates / MCP servers" },
-  { t: "09:14:05", tag: "SECURITY", text: "12 vulnerabilities found + exploited + fixed + verified" },
+  { t: "09:14:05", tag: "SECURITY", text: "12 vulnerabilities found + fixed (lab app)" },
   { t: "09:14:05", tag: "DEPLOY", text: "Azure + AWS + fully on-prem model paths" },
   { t: "09:14:06", tag: "STACK", text: ".NET 9 / gRPC / Entra ID / SQL Server / Postgres" },
   { t: "09:14:06", tag: "CERTS", text: "3x AWS + AI-for-cybersecurity + ISTQB + EC-Council" },
@@ -69,7 +69,7 @@ export const EVIDENCE_LOG = [
 export const ABOUT_PROSE = [
   {
     label: "role",
-    body: "Senior Programmer/Analyst at a Newfoundland and Labrador provincial health authority, working in a large enterprise .NET codebase. I build full-stack, AI-integrated compliance and clinical-safety reporting systems, and I'm on the team building the internal enterprise identity & access management platform — primarily backend and systems integration across enterprise clinical and HR systems, with integration and deployment spanning Azure and AWS.",
+    body: "Senior Programmer/Analyst at a Newfoundland and Labrador provincial health authority, working in a large modular-monolith .NET codebase with enforced module boundaries and per-module schema ownership. I build full-stack, AI-integrated compliance and clinical-safety reporting systems, run high-volume identity reconciliation and data-quality pipelines against external clinical systems, and I'm on the team building the internal enterprise identity & access management platform — primarily backend and systems integration across enterprise clinical and HR systems, with integration and deployment spanning Azure and AWS.",
   },
   {
     label: "practice",
@@ -92,10 +92,12 @@ export type Capability = {
 
 export const CAPABILITIES: Capability[] = [
   { name: ".NET / C#", level: 3, shipped: true, current: true, tags: ["C# / .NET 9", "gRPC", "REST APIs"] },
+  { name: "architecture", level: 3, shipped: true, current: true, tags: ["modular monolith", "module boundaries", "schema ownership"] },
   { name: "identity / access", level: 3, shipped: true, current: true, tags: ["Entra ID", "Microsoft Graph", "AD / LDAP"] },
+  { name: "identity data", level: 3, shipped: true, current: true, tags: ["reconciliation", "data-quality pipelines", "dedup at scale"] },
   { name: "agentic tooling", level: 3, shipped: true, current: true, tags: ["Claude Code", "Codex", "MCP", "orchestration"] },
   { name: "LLM systems", level: 2, shipped: true, current: true, tags: ["Claude API", "LiteLLM", "on-prem LLM"] },
-  { name: "data", level: 2, shipped: true, current: true, tags: ["SQL Server", "PostgreSQL"] },
+  { name: "data", level: 2, shipped: true, current: true, tags: ["SQL Server", "DB-first schema evolution", "PostgreSQL"] },
   { name: "cloud", level: 2, shipped: true, current: true, tags: ["Azure", "AWS", "Docker"] },
   { name: "web", level: 2, shipped: true, current: false, tags: ["Node.js / TypeScript", "React", "Next.js"] },
   { name: "security", level: 2, shipped: true, current: true, tags: ["LLM red-teaming", "Semgrep", "OWASP"] },
