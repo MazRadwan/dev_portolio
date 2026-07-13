@@ -447,6 +447,12 @@
   html {
     scroll-behavior: auto;
   }
+
+  /* The block cursor's opacity blink is non-spatial — keep the display alive. */
+  .block-cursor {
+    animation-duration: 1.15s !important;
+    animation-iteration-count: infinite !important;
+  }
   *,
   *::before,
   *::after {

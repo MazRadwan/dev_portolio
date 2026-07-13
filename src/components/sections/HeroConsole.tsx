@@ -55,14 +55,17 @@ export function HeroConsole() {
   }, []);
 
   useEffect(() => {
+    // Reduced motion: no boot choreography or spatial motion, but the quiet
+    // TEXT liveness (state-machine walk, proof-channel cycling) still runs —
+    // "reduce" targets spatial motion, not content updates.
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return;
 
     const timers: ReturnType<typeof setTimeout>[] = [];
     const set = (patch: Partial<typeof RESOLVED>) => setS((p) => ({ ...p, ...patch }));
     const at = (ms: number, fn: () => void) => timers.push(setTimeout(fn, ms));
 
     // --- one-time boot: identity/title already visible on the left ---
+    if (!reduce) {
     at(150, () => set({ init: "initializing identity_access_console" }));
     READOUT.forEach((_, i) => at(350 + i * 120, () => set({ rows: i + 1 })));
     at(1000, () => set({ subOn: true }));
@@ -76,6 +79,7 @@ export function HeroConsole() {
     };
     walk(1100);
     at(1450, () => set({ header: "READY", init: "console online", chanOn: true }));
+    }
 
     // --- quiet live loops after boot ---
     let lifeTimer: ReturnType<typeof setInterval> | null = null;
@@ -96,7 +100,7 @@ export function HeroConsole() {
       if (chanTimer) clearInterval(chanTimer);
       lifeTimer = chanTimer = null;
     };
-    at(2000, startLoops);
+    at(reduce ? 400 : 2000, startLoops);
 
     const onVis = () => {
       if (document.hidden) stopLoops();
