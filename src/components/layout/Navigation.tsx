@@ -10,10 +10,13 @@ function Monogram() {
     <Link href="/" className="group flex items-center gap-2.5" aria-label="maz.radwan — home">
       <svg width="24" height="24" viewBox="0 0 32 32" fill="none" aria-hidden="true">
         <rect x="0.5" y="0.5" width="31" height="31" className="fill-surface-2 stroke-line" />
-        <path d="M9 16 H23" strokeWidth="2" className="stroke-line-strong" />
-        <path d="M14.5 16 H22" strokeWidth="2" stroke="var(--accent)" />
-        <rect x="6.6" y="13.6" width="4.8" height="4.8" fill="var(--accent-2)" />
-        <rect x="20.6" y="13.6" width="4.8" height="4.8" fill="var(--accent)" />
+        <path
+          d="M9 10.5 L15.5 16 L9 21.5"
+          strokeWidth="2.6"
+          strokeLinecap="square"
+          className="stroke-ink"
+        />
+        <rect x="18.5" y="10.5" width="5.6" height="11" className="mark-cursor" />
       </svg>
       <span className="mono-label text-ink transition-colors group-hover:text-accent">maz.radwan</span>
     </Link>

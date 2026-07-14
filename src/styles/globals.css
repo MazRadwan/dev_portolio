@@ -275,6 +275,13 @@
     animation: tui-blink 1.15s steps(1) infinite;
   }
 
+  /* SVG twin of .block-cursor for the brand mark (geometry lives in the SVG,
+     so only fill + blink here). */
+  .mark-cursor {
+    fill: var(--accent);
+    animation: tui-blink 1.15s steps(1) infinite;
+  }
+
   /* Live square indicator with a soft expanding ring. */
   .pulse-sq {
     position: relative;
@@ -449,7 +456,8 @@
   }
 
   /* The block cursor's opacity blink is non-spatial — keep the display alive. */
-  .block-cursor {
+  .block-cursor,
+  .mark-cursor {
     animation-duration: 1.15s !important;
     animation-iteration-count: infinite !important;
   }
