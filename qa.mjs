@@ -70,6 +70,8 @@ async function assertContent(page, tag) {
   const expectedCerts = [
     "AWS Developer Associate",
     "AWS Cloud Practitioner",
+    "AWS Academy Cloud Architecting",
+    "AWS Academy Cloud Developing",
     "AI for Cybersecurity",
     "ISTQB Certified Tester (QA/QC)",
     "EC-Council Cyber-Security Technician",
