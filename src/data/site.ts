@@ -77,7 +77,7 @@ export const ABOUT_PROSE = [
   },
   {
     label: "security",
-    body: "Recently certified in AI for Cybersecurity, with hands-on LLM security work: prompt-injection and MCP tool-poisoning red-teaming, AI-assisted security review in CI, and custom SAST/secrets rules. The capstone found, exploited, fixed, and test-verified 12 vulnerabilities against a deliberately vulnerable app, including LLM-specific findings.",
+    body: "Recently certified in AI for Cybersecurity, with hands-on LLM security work: prompt-injection and MCP tool-poisoning red-teaming, AI-assisted security review in CI, and custom SAST/secrets rules. The lab work found, exploited, fixed, and test-verified 12 vulnerabilities against a deliberately vulnerable app, including LLM-specific findings.",
   },
 ] as const;
 
@@ -186,12 +186,12 @@ export const PROJECTS: Project[] = [
     title: "AI for Cybersecurity",
     summary:
       "LLM red-teaming, AI-assisted security review in CI, and a full vulnerable-app assessment.",
-    body: "Prompt injection, MCP tool poisoning, and the \"lethal trifecta\"; AI-assisted security review in GitHub Actions; 15 custom Semgrep SAST rules plus 15 secrets/PII detectors; adversarial-ML data poisoning. Capstone: 12 vulnerabilities found, exploited, fixed, and test-verified — including LLM-specific findings like tool-calling data exfiltration, LLM-controlled path traversal, and unrestricted LLM-generated SQL.",
+    body: "Prompt injection, MCP tool poisoning, and the \"lethal trifecta\"; AI-assisted security review in GitHub Actions; 15 custom Semgrep SAST rules plus 15 secrets/PII detectors; adversarial-ML data poisoning. Lab results: 12 vulnerabilities found, exploited, fixed, and test-verified — including LLM-specific findings like tool-calling data exfiltration, LLM-controlled path traversal, and unrestricted LLM-generated SQL.",
     tags: ["LLM Security", "Semgrep", "TruffleHog", "OWASP", "GitHub Actions", "Python"],
   },
 ];
 
-// Findings ledger for the security case instrument (verified capstone results).
+// Findings ledger for the security case instrument (verified lab results).
 export const SECURITY_FINDINGS = [
   { id: "F-01", finding: "tool-calling data exfiltration", severity: "llm", state: "fixed" },
   { id: "F-02", finding: "LLM-controlled path traversal", severity: "llm", state: "fixed" },
