@@ -18,7 +18,7 @@ export const SITE = {
 } as const;
 
 // Immediate proof, shown directly under the hero title.
-export const PROOF_LINE = ["PROVINCIAL HEALTHCARE", "IAM", "12 LAB VULNS FIXED", "3 AWS CERTS"] as const;
+export const PROOF_LINE = ["PROVINCIAL HEALTHCARE", "IAM", "12 LAB VULNS FIXED", "2 AWS CERTS"] as const;
 
 export const NAV_ITEMS = [
   { label: "About", href: "#about" },
@@ -50,7 +50,7 @@ export const SUBSYSTEMS = [
 export const PROOF_CHANNEL = [
   { key: "CASE_FILES", value: "05" },
   { key: "LAB_VULNS_FIXED", value: "12" },
-  { key: "AWS_CERTS", value: "03" },
+  { key: "AWS_CERTS", value: "02" },
   { key: "DEPLOY_MODE", value: "CLOUD | ON_PREM" },
 ] as const;
 
@@ -62,7 +62,7 @@ export const EVIDENCE_LOG = [
   { t: "09:14:05", tag: "SECURITY", text: "12 vulnerabilities found + fixed (lab app)" },
   { t: "09:14:05", tag: "DEPLOY", text: "Azure + AWS + fully on-prem model paths" },
   { t: "09:14:06", tag: "STACK", text: ".NET 9 / gRPC / Entra ID / SQL Server / Postgres" },
-  { t: "09:14:06", tag: "CERTS", text: "3x AWS + AI-for-cybersecurity + ISTQB + EC-Council" },
+  { t: "09:14:06", tag: "CERTS", text: "2x AWS + AI-for-cybersecurity + ISTQB + EC-Council" },
 ] as const;
 
 // Full explanatory prose, kept for the <details> "inspect full profile" disclosure.
@@ -107,7 +107,6 @@ export const CAPABILITIES: Capability[] = [
 export type Cert = { credential: string; issuer: string; year: string; state: string; aws: boolean };
 
 export const CERTS: Cert[] = [
-  { credential: "AWS Solutions Architect", issuer: "Amazon Web Services", year: "2024", state: "ACTIVE", aws: true },
   { credential: "AWS Developer Associate", issuer: "Amazon Web Services", year: "2025", state: "ACTIVE", aws: true },
   { credential: "AWS Cloud Practitioner", issuer: "Amazon Web Services", year: "2024", state: "ACTIVE", aws: true },
   { credential: "AI for Cybersecurity", issuer: "techNL", year: "2026", state: "VERIFIED", aws: false },

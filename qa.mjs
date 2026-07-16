@@ -68,7 +68,6 @@ async function assertContent(page, tag) {
   if (!/\bAWS\b/.test(bodyText)) note(tag, `AWS not present`);
   // Certs live in an audit table (credential / issuer / year / state cells).
   const expectedCerts = [
-    "AWS Solutions Architect",
     "AWS Developer Associate",
     "AWS Cloud Practitioner",
     "AI for Cybersecurity",
