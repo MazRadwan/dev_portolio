@@ -18,7 +18,7 @@ export default function Home() {
         <link rel="canonical" href="https://mazradwan.netlify.app/" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://mazradwan.netlify.app/" />
-        <meta property="og:image" content="https://mazradwan.netlify.app/og.png" />
+        <meta property="og:image" content="https://mazradwan.netlify.app/og.png?v=2" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:title" content={SITE.title} />
@@ -27,7 +27,7 @@ export default function Home() {
         <meta property="og:locale" content="en_CA" />
 
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image" content="https://mazradwan.netlify.app/og.png" />
+        <meta name="twitter:image" content="https://mazradwan.netlify.app/og.png?v=2" />
         <meta name="twitter:title" content={SITE.title} />
         <meta name="twitter:description" content={SITE.description} />
         <script
